@@ -23,6 +23,8 @@ void AScareSpot::OnConstruction(const FTransform& Transform)
 {
 	if (ScareSpotMesh) ScareSpotMeshComponent->SetStaticMesh(ScareSpotMesh);
 	ActivationSphere->SetSphereRadius(ActivationDistance);
+
+	ActivationSphere->SetRelativeLocation(ActivationSphereRelativeLocation);
 }
 
 // Called every frame
@@ -30,9 +32,45 @@ void AScareSpot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Reduce cooldown timer until available again
-	if (CooldownTimer > 0.f) CooldownTimer -= DeltaTime;
+	// Reduce active timer until scare stops
+	if (ActiveTimer > 0.f) ActiveTimer -= DeltaTime;
 
 	// Set usable again
-	if (CooldownTimer <= 0.f && IsInUse) IsInUse = false;
+	if (ActiveTimer <= 0.f && ScareState == EScareState::ACTIVE) BeginCooldown();
+
+	// Reduce cooldown timer until available again
+	if (CooldownTimer > 0) CooldownTimer -= DeltaTime;
+	
+	// Start the cooldown period
+	if (CooldownTimer <= 0.f && ScareState == EScareState::COOLDOWN) ResetScareSpot();
+}
+
+// Called when the player activates the scare spot
+void AScareSpot::ReceiveActivateScareSpot()
+{
+	 if (ScareState == EScareState::READY)
+	 {
+	 	ScareState = EScareState::ACTIVE;
+	 	ActiveTimer = ActiveTime;
+		ActivateScareSpot();
+	 }
+}
+
+// Called when the scare spot finishes scaring and starts the cooldown period
+void AScareSpot::BeginCooldown()
+{
+	OnScareFinish();
+	
+	if (Retriggerable)
+	{
+		ScareState = EScareState::COOLDOWN;
+		CooldownTimer = CooldownTime;
+	} else ScareState = EScareState::OFF;
+}
+
+// Called when the scare spot is made active again
+void AScareSpot::ResetScareSpot()
+{
+	ScareState = EScareState::READY;
+	OnScareReset();
 }
