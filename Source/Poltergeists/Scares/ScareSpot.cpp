@@ -15,7 +15,7 @@ AScareSpot::AScareSpot()
 
 	// Connect all the components to the root
 	ScareSpotMeshComponent->SetupAttachment(RootComponent);
-	ActivationSphere->SetupAttachment(RootComponent);
+	ActivationSphere->SetupAttachment(RootComponent);	
 }
 
 // Called whenever a value is changed
