@@ -6,7 +6,10 @@
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "Engine/Engine.h"
+#include "Victim.h"
 #include "ScareSpot.generated.h"
+
+class AVictim;
 
 // Enum for the effect type of the scare spot
 UENUM()
@@ -24,7 +27,7 @@ enum class EScareState : uint8
 {
 	READY UMETA(DisplayName="Ready"),
 	ACTIVE UMETA(DisplayName="Active"),
-	COOLDOWN UMETA(DisplayName="Cooldown"),
+	RECHARGING UMETA(DisplayName="Recharging"),
 	OFF UMETA(DisplayName="Off"),
 	MAX
 };
@@ -59,20 +62,26 @@ public:
 	// Time for which the scare spot is in use
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
 		float ActiveTime = 3.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
-		float CooldownTime = 3.f;
 	UPROPERTY()
 		float ActiveTimer = 0.f;
-	UPROPERTY()
-		float CooldownTimer = 0.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Activation")
 		EScareState ScareState = EScareState::READY;
 
+	// Time it takes for the scare to regain its maximum scare power
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
+		float RechargeTime = 30.f;
+	UPROPERTY()
+		float RechargeTimer = 30.f;
+	
 	// Details about the specific scare
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scare")
 		float ScareStrength = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scare")
 		EScareType ScareType = EScareType::MAX;
+
+	// The victim of the scare
+	UPROPERTY(BlueprintReadOnly, Category = "Victim")
+		AVictim* Victim;
 
 protected:
 	// Called whenever a value is changed
@@ -84,20 +93,20 @@ public:
 
 	// Called when the player activates the scare spot
 	UFUNCTION(BlueprintCallable, Category = "Activation", DisplayName = "ActivateScareSpot")
-		void ReceiveActivateScareSpot();
+		bool ReceiveActivateScareSpot();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Activation")
 		void ActivateScareSpot();
 
-	// Called when the scare spot finishes scaring and starts the cooldown period
+	// Called when the scare spot finishes scaring and starts the recharge period
 	UFUNCTION()
-		void BeginCooldown();
+		void BeginRecharge();
 
 	// Called when the scare spot is made active again
 	UFUNCTION()
 		void ResetScareSpot();
 
 	// Called when the state changes
-	UFUNCTION(BlueprintNativeEvent, Category = "Cooldown")
+	UFUNCTION(BlueprintNativeEvent, Category = "Scare")
 		void OnScareFinish();
 		void OnScareFinish_Implementation(){};
 	UFUNCTION(BlueprintNativeEvent, Category = "Activation")
