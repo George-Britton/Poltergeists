@@ -4,6 +4,7 @@
 #include "PlayerPoltergeist.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 APlayerPoltergeist::APlayerPoltergeist()
@@ -104,15 +105,40 @@ void APlayerPoltergeist::Dash()
 }
 void APlayerPoltergeist::Pickup()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "1");
 	if (!IsItemHeld)
 	{
-		//UKismetSystemLibrary::BoxTraceForObjects
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "2");
+		FHitResult HitResult;
+		FVector TraceToLocation = GetActorForwardVector() * PickupDistance + GetActorLocation();
+		TraceToLocation.Y -= 20;
+		TArray<TEnumAsByte<EObjectTypeQuery>> YeetTypes;
+		TArray<AActor*> Ignored;
+		if(UKismetSystemLibrary::BoxTraceSingleForObjects(this, GetActorLocation(), TraceToLocation, FVector::ZeroVector, FRotator::ZeroRotator, YeetTypes, false, Ignored, EDrawDebugTrace::ForDuration, HitResult, true, FColor::Red, FColor::Green, 5))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "3");
+			if (HitResult.Component->IsSimulatingPhysics())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "4");
+				FTransform RelTransform;
+				PhysicsHandle = Cast<UPhysicsHandleComponent>(AddComponent("UPhysicsHandleComponent", true, RelTransform, NULL));
+				AddOwnedComponent(PhysicsHandle);
+				PhysicsHandle->GrabComponentAtLocation(HitResult.GetComponent(), "None", HitResult.Location);
+				IsItemHeld = true;
+				ObjectBeingHeld = HitResult.GetComponent();
+			}
+		}
 	}
 }
 void APlayerPoltergeist::Yeet()
 {
 	if (IsItemHeld)
 	{
+		PhysicsHandle->ReleaseComponent();
+		PhysicsHandle->DestroyComponent();
+		PhysicsHandle = nullptr;
+		IsItemHeld = false;
+		ObjectBeingHeld->AddImpulse(GetActorForwardVector() * YeetStrength, "None", true);
 		YeetCooldownTimer = YeetCooldown;
 	}
 }

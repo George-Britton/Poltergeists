@@ -54,6 +54,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Yeet")
 		FOnYeet OnYeet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
+		float PickupDistance = 125.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float YeetStrength = 2500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float YeetCooldown = 5.f;
