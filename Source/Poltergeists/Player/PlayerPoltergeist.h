@@ -25,6 +25,12 @@ public:
 	// Overlapped scare spot
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		AScareSpot* OverlappedScareSpot;
+
+	// Time it takes for the player's scare ability to cooldown
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scares")
+		float Cooldown = 3.f;
+	UPROPERTY()
+		float CooldownTimer = 0.f;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -46,5 +52,8 @@ public:
 	void MoveRight(float AxisValue);
 
 	// Input action for scare activation
-	void ActivateScareSpot();
+	UFUNCTION(BlueprintCallable, Category = "Activation", DisplayName = "ActivateScareSpot")
+		void ReceiveActivateScare();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Activation")
+		void ActivateScare();
 };

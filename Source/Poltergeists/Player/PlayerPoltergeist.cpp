@@ -23,6 +23,8 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Reduce the cooldown timer
+	if (CooldownTimer > 0) CooldownTimer -= DeltaTime;
 }
 
 // Called whenever the player overlaps with something or stops overlapping
@@ -46,7 +48,7 @@ void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerPoltergeist::MoveRight);
 
 	// Bind scare activation input
-	PlayerInputComponent->BindAction("ActivateScare", IE_Pressed, this, &APlayerPoltergeist::ActivateScareSpot);
+	PlayerInputComponent->BindAction("ActivateScare", IE_Pressed, this, &APlayerPoltergeist::ReceiveActivateScare);
 }
 
 // Input axis for movement
@@ -66,7 +68,14 @@ void APlayerPoltergeist::MoveRight(float AxisValue)
 }
 
 // Input action for scare activation
-void APlayerPoltergeist::ActivateScareSpot()
+void APlayerPoltergeist::ReceiveActivateScare()
 {
-	if (OverlappedScareSpot) OverlappedScareSpot->ReceiveActivateScareSpot();
+	if (OverlappedScareSpot && CooldownTimer <= 0)
+	{
+		if (OverlappedScareSpot->ReceiveActivateScareSpot())
+		{
+			CooldownTimer = Cooldown;
+			ActivateScare();
+		}
+	}
 }

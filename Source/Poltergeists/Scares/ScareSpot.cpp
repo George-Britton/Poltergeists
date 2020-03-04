@@ -3,6 +3,7 @@
 
 #include "ScareSpot.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AScareSpot::AScareSpot()
@@ -15,7 +16,7 @@ AScareSpot::AScareSpot()
 
 	// Connect all the components to the root
 	ScareSpotMeshComponent->SetupAttachment(RootComponent);
-	ActivationSphere->SetupAttachment(RootComponent);	
+	ActivationSphere->SetupAttachment(RootComponent);
 }
 
 // Called whenever a value is changed
@@ -33,38 +34,46 @@ void AScareSpot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Reduce active timer until scare stops
-	if (ActiveTimer > 0.f) ActiveTimer -= DeltaTime;
+	if (ActiveTimer > 0.f) FMath::Clamp<float>(ActiveTimer -= DeltaTime, 0, ActiveTime);
 
 	// Set usable again
-	if (ActiveTimer <= 0.f && ScareState == EScareState::ACTIVE) BeginCooldown();
+	if (ActiveTimer <= 0.f && ScareState == EScareState::ACTIVE) BeginRecharge();
 
 	// Reduce cooldown timer until available again
-	if (CooldownTimer > 0) CooldownTimer -= DeltaTime;
+	if (ScareState == EScareState::RECHARGING) FMath::Clamp<float>(RechargeTimer += DeltaTime, 0, RechargeTime);
 	
 	// Start the cooldown period
-	if (CooldownTimer <= 0.f && ScareState == EScareState::COOLDOWN) ResetScareSpot();
+	if (RechargeTimer >= RechargeTime && ScareState == EScareState::RECHARGING) ResetScareSpot();
 }
 
 // Called when the player activates the scare spot
-void AScareSpot::ReceiveActivateScareSpot()
+bool AScareSpot::ReceiveActivateScareSpot()
 {
-	 if (ScareState == EScareState::READY)
-	 {
-	 	ScareState = EScareState::ACTIVE;
-	 	ActiveTimer = ActiveTime;
+	// Scares the victim if possible
+	if (ScareState == EScareState::READY || ScareState == EScareState::RECHARGING)
+	{
+		// Sets the victim if it doesn't already exist
+		if (!Victim) Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
+		
+		ScareState = EScareState::ACTIVE;
+		ActiveTimer = ActiveTime;
 		ActivateScareSpot();
-	 }
+		Victim->ReceiveScare(GetActorLocation(), ScareStrength * (RechargeTimer / RechargeTime));
+		
+		return true;
+	}
+	return false;
 }
 
 // Called when the scare spot finishes scaring and starts the cooldown period
-void AScareSpot::BeginCooldown()
+void AScareSpot::BeginRecharge()
 {
 	OnScareFinish();
 	
 	if (Retriggerable)
 	{
-		ScareState = EScareState::COOLDOWN;
-		CooldownTimer = CooldownTime;
+		ScareState = EScareState::RECHARGING;
+		RechargeTimer = 0;
 	} else ScareState = EScareState::OFF;
 }
 
@@ -72,5 +81,6 @@ void AScareSpot::BeginCooldown()
 void AScareSpot::ResetScareSpot()
 {
 	ScareState = EScareState::READY;
+	RechargeTimer = RechargeTime;
 	OnScareReset();
 }
