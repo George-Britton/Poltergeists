@@ -2,6 +2,8 @@
 
 
 #include "PlayerPoltergeist.h"
+#include "TimerManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerPoltergeist::APlayerPoltergeist()
@@ -9,6 +11,9 @@ APlayerPoltergeist::APlayerPoltergeist()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Allow the player to rotate towards their movement vector
+	GetCharacterMovement()->bOrientRotationToMovement = 1;
+	bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned
@@ -22,9 +27,12 @@ void APlayerPoltergeist::BeginPlay()
 void APlayerPoltergeist::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	// Reduce the cooldown timer
-	if (CooldownTimer > 0) CooldownTimer -= DeltaTime;
+	if (CooldownTimer > 0) FMath::Clamp<float>(CooldownTimer -= DeltaTime, 0, Cooldown);
+
+	// Reduce ability cooldowns
+	if (DashCooldownTimer > 0) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
 }
 
 // Called whenever the player overlaps with something or stops overlapping
@@ -49,6 +57,9 @@ void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	// Bind scare activation input
 	PlayerInputComponent->BindAction("ActivateScare", IE_Pressed, this, &APlayerPoltergeist::ReceiveActivateScare);
+
+	// Bind ability inputs
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &APlayerPoltergeist::Dash);
 }
 
 // Input axis for movement
@@ -77,5 +88,16 @@ void APlayerPoltergeist::ReceiveActivateScare()
 			CooldownTimer = Cooldown;
 			ActivateScare();
 		}
+	}
+}
+
+// Input actions for abilities
+void APlayerPoltergeist::Dash()
+{
+	if (DashCooldownTimer <= 0.f)
+	{
+		ACharacter::LaunchCharacter(GetActorForwardVector() * DashSpeed, true, false);
+		DashCooldownTimer = DashCooldown;
+		OnDash.Broadcast();
 	}
 }

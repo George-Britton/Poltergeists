@@ -9,6 +9,11 @@
 #include "Scares/ScareSpot.h"
 #include "PlayerPoltergeist.generated.h"
 
+class APlayerPoltergeist;
+
+// Event delegate for the abilities
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnDash, APlayerPoltergeist, OnDash);
+
 UCLASS()
 class POLTERGEISTS_API APlayerPoltergeist : public ACharacter
 {
@@ -31,6 +36,17 @@ public:
 		float Cooldown = 3.f;
 	UPROPERTY()
 		float CooldownTimer = 0.f;
+
+	// Event Dispatchers for abilities
+	UPROPERTY(BlueprintAssignable, Category = "Abilities|Dash")
+		FOnDash OnDash;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
+		float DashSpeed = 2500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
+		float DashTimeInSeconds = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
+		float DashCooldown = 5.f;
+		float DashCooldownTimer = 0.f;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -56,4 +72,7 @@ public:
 		void ReceiveActivateScare();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Activation")
 		void ActivateScare();
+
+	// Input actions for abilities
+		void Dash();
 };
