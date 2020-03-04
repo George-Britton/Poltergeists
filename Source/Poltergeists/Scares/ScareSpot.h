@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
 #include "Engine/Engine.h"
-#include "Victim.h"
+#include "Characters/Victim.h"
 #include "ScareSpot.generated.h"
 
 class AVictim;
@@ -69,9 +69,9 @@ public:
 
 	// Time it takes for the scare to regain its maximum scare power
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
-		float RechargeTime = 30.f;
+		float RechargeTime = 10.f;
 	UPROPERTY()
-		float RechargeTimer = 30.f;
+		float RechargeTimer;
 	
 	// Details about the specific scare
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scare")

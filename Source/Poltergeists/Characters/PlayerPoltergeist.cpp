@@ -20,7 +20,6 @@ APlayerPoltergeist::APlayerPoltergeist()
 void APlayerPoltergeist::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -60,6 +59,8 @@ void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	// Bind ability inputs
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &APlayerPoltergeist::Dash);
+	PlayerInputComponent->BindAction("Yeet", IE_Pressed, this, &APlayerPoltergeist::Pickup);
+	PlayerInputComponent->BindAction("Yeet", IE_Released, this, &APlayerPoltergeist::Yeet);
 }
 
 // Input axis for movement
@@ -99,5 +100,19 @@ void APlayerPoltergeist::Dash()
 		ACharacter::LaunchCharacter(GetActorForwardVector() * DashSpeed, true, false);
 		DashCooldownTimer = DashCooldown;
 		OnDash.Broadcast();
+	}
+}
+void APlayerPoltergeist::Pickup()
+{
+	if (!IsItemHeld)
+	{
+		//UKismetSystemLibrary::BoxTraceForObjects
+	}
+}
+void APlayerPoltergeist::Yeet()
+{
+	if (IsItemHeld)
+	{
+		YeetCooldownTimer = YeetCooldown;
 	}
 }

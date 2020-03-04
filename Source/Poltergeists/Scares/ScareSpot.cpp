@@ -17,15 +17,19 @@ AScareSpot::AScareSpot()
 	// Connect all the components to the root
 	ScareSpotMeshComponent->SetupAttachment(RootComponent);
 	ActivationSphere->SetupAttachment(RootComponent);
+	RootComponent->SetMobility(EComponentMobility::Movable);
+	ScareSpotMeshComponent->SetMobility(EComponentMobility::Movable);
 }
 
 // Called whenever a value is changed
 void AScareSpot::OnConstruction(const FTransform& Transform)
 {
 	if (ScareSpotMesh) ScareSpotMeshComponent->SetStaticMesh(ScareSpotMesh);
-	ActivationSphere->SetSphereRadius(ActivationDistance);
+		ActivationSphere->SetSphereRadius(ActivationDistance);
 
 	ActivationSphere->SetRelativeLocation(ActivationSphereRelativeLocation);
+	
+	RechargeTimer = RechargeTime;
 }
 
 // Called every frame
