@@ -31,15 +31,23 @@ public:
 	// Array of all the scare spots - places they might run to
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void RoundStart();
+
+	// Called when the fear meter is full
+	UFUNCTION(BlueprintCallable, Category = "Events", DisplayName = "RunAway")
+		void ReceiveRunAway();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void RunAway();
 
 	// Called when the victim enters a new room / level
 	void EnterNewRoom();
-	
-public:	
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
