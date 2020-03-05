@@ -11,6 +11,7 @@ APlayerPoltergeist::APlayerPoltergeist()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Physics Handle"));
 
 	// Allow the player to rotate towards their movement vector
 	GetCharacterMovement()->bOrientRotationToMovement = 1;
@@ -62,6 +63,10 @@ void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &APlayerPoltergeist::Dash);
 	PlayerInputComponent->BindAction("Yeet", IE_Pressed, this, &APlayerPoltergeist::Pickup);
 	PlayerInputComponent->BindAction("Yeet", IE_Released, this, &APlayerPoltergeist::Yeet);
+
+	// Keep the physics handle in front of the player
+	//FVector ForwardVecHold = GetActorForwardVector() * ItemHeldDistance;
+	//if (IsItemHeld) PhysicsHandle->SetTargetLocation(ForwardVecHold + GetActorLocation());
 }
 
 // Input axis for movement
@@ -105,25 +110,19 @@ void APlayerPoltergeist::Dash()
 }
 void APlayerPoltergeist::Pickup()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "1");
 	if (!IsItemHeld)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "2");
 		FHitResult HitResult;
 		FVector TraceToLocation = GetActorForwardVector() * PickupDistance + GetActorLocation();
-		TraceToLocation.Y -= 20;
+		TraceToLocation.Z -= 50;
 		TArray<TEnumAsByte<EObjectTypeQuery>> YeetTypes;
+		YeetTypes.Init(UCollisionProfile::Get()->ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody), 1);
 		TArray<AActor*> Ignored;
-		if(UKismetSystemLibrary::BoxTraceSingleForObjects(this, GetActorLocation(), TraceToLocation, FVector::ZeroVector, FRotator::ZeroRotator, YeetTypes, false, Ignored, EDrawDebugTrace::ForDuration, HitResult, true, FColor::Red, FColor::Green, 5))
+		if(UKismetSystemLibrary::BoxTraceSingleForObjects(this, GetActorLocation(), TraceToLocation, FVector(40, 40, 160), FRotator::ZeroRotator, YeetTypes, false, Ignored, EDrawDebugTrace::None, HitResult, true))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "3");
 			if (HitResult.Component->IsSimulatingPhysics())
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "4");
-				FTransform RelTransform;
-				PhysicsHandle = Cast<UPhysicsHandleComponent>(AddComponent("UPhysicsHandleComponent", true, RelTransform, NULL));
-				AddOwnedComponent(PhysicsHandle);
-				PhysicsHandle->GrabComponentAtLocation(HitResult.GetComponent(), "None", HitResult.Location);
+				PhysicsHandle->GrabComponentAtLocation(HitResult.GetComponent(), "None", HitResult.GetComponent()->GetComponentLocation());
 				IsItemHeld = true;
 				ObjectBeingHeld = HitResult.GetComponent();
 			}
@@ -134,11 +133,11 @@ void APlayerPoltergeist::Yeet()
 {
 	if (IsItemHeld)
 	{
-		PhysicsHandle->ReleaseComponent();
-		PhysicsHandle->DestroyComponent();
-		PhysicsHandle = nullptr;
 		IsItemHeld = false;
-		ObjectBeingHeld->AddImpulse(GetActorForwardVector() * YeetStrength, "None", true);
+		PhysicsHandle->ReleaseComponent();
+		FVector YeetDirection = GetActorForwardVector() * YeetStrength;
+		YeetDirection.Z += YeetIncline;
+		ObjectBeingHeld->AddImpulse(YeetDirection, "None", true);
 		YeetCooldownTimer = YeetCooldown;
 	}
 }

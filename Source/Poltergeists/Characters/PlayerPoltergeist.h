@@ -56,16 +56,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float PickupDistance = 125.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
-		float YeetStrength = 2500.f;
+		float YeetStrength = 3000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
-		float YeetCooldown = 5.f;
+		float YeetIncline = 50.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
+		float YeetCooldown = 0.00001f;
 		float YeetCooldownTimer = 0.f;
-	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
+	UPROPERTY(BlueprintReadWrite, Category = "Abilities|Yeet")
 		UPhysicsHandleComponent* PhysicsHandle;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		bool IsItemHeld = false;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		UPrimitiveComponent* ObjectBeingHeld;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
+		float ItemHeldDistance = 50.f;
 	
 	
 protected:
