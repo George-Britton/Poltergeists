@@ -83,6 +83,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Victim")
 		AVictim* Victim;
 
+	// The timer for the curse effect
+	float CurseTimer = 0.f;
+	bool IsCursed = false;
+	float CurseResetStrength = 0.f;
+
+	// The timers for the time bomb
+	TArray<float> TimeBombFuses;
+	
 protected:
 	// Called whenever a value is changed
 	void OnConstruction(const FTransform& Transform) override;
@@ -112,4 +120,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "Activation")
 		void OnScareReset();
 		void OnScareReset_Implementation(){};
+
+	// Called when the curse boi curses the scare spot
+		bool Curse(float Multiplier, float Time);
+	// Called when the time bomb sets and explodes
+		void TimeBomb(float Time);
 };

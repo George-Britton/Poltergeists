@@ -9,6 +9,9 @@
 
 class AScareSpot;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCaughtInTrap);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFreedFromTrap);
+
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
 {
@@ -32,6 +35,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
 
+	// Whether the victim is caught in a trap
+	UPROPERTY(BlueprintReadOnly, Category = "Trap")
+		bool Trapped = false;
+		TArray<AActor*> Traps;
+
+	// Event Dispatcher for getting caught in a trap
+	UPROPERTY(BlueprintAssignable, Category = "Trap")
+		FOnCaughtInTrap OnCaughtInTrap;
+	UPROPERTY(BlueprintAssignable, Category = "Trap")
+		FOnFreedFromTrap OnFreedFromTrap;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,4 +70,8 @@ public:
 		void ReceiveScare(FVector ScareSource, float ScareStrength);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scare")
 		void Scare(FVector ScareSource, float ScareStrength);
+
+	// Called when the victim is caught in a trap
+	void Snare(AActor* Trap);
+	void UnSnare(AActor* Trap);
 };

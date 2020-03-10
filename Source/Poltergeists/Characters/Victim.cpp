@@ -73,3 +73,17 @@ void AVictim::ReceiveScare(FVector ScareSource, float ScareStrength)
 		Scare(ScareSource, ScareStrength);
 	}
 }
+
+// Called when the victim is caught in a trap
+void AVictim::Snare(AActor* Trap)
+{
+	Trapped = true;
+	Traps.Add(Trap);
+	OnCaughtInTrap.Broadcast();
+}
+void AVictim::UnSnare(AActor* Trap)
+{
+	Traps.Remove(Trap);
+	if (Traps.Num() == 0) Trapped = false;
+	OnFreedFromTrap.Broadcast();
+}
