@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "Scares/ScareSpot.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Abilities/Yeetable.h"
 #include "PlayerPoltergeist.generated.h"
 
 class APlayerPoltergeist;
@@ -79,7 +80,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		bool IsItemHeld = false;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
-		UPrimitiveComponent* ObjectBeingHeld;
+		UPrimitiveComponent* ComponentHeld;
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
+		AYeetable* ObjectBeingHeld;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float ItemHeldDistance = 50.f;
 	// Special

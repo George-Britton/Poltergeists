@@ -5,6 +5,7 @@
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/Trap.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -133,7 +134,9 @@ void APlayerPoltergeist::Pickup()
 			{
 				PhysicsHandle->GrabComponentAtLocation(HitResult.GetComponent(), "None", HitResult.GetComponent()->GetComponentLocation());
 				IsItemHeld = true;
-				ObjectBeingHeld = HitResult.GetComponent();
+				ComponentHeld = HitResult.GetComponent();
+				ObjectBeingHeld = Cast<AYeetable>(HitResult.GetActor());
+				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, ObjectBeingHeld->GetName() + " picked up");
 			}
 		}
 	}
@@ -147,7 +150,10 @@ void APlayerPoltergeist::Yeet()
 		PhysicsHandle->ReleaseComponent();
 		FVector YeetDirection = GetActorForwardVector() * YeetStrength;
 		YeetDirection.Z += YeetIncline;
-		ObjectBeingHeld->AddImpulse(YeetDirection, "None", true);
+		ComponentHeld->AddImpulse(YeetDirection, "None", true);
+		ObjectBeingHeld->Yate = true;
+		ComponentHeld = nullptr;
+		ObjectBeingHeld = nullptr;
 		YeetCooldownTimer = YeetCooldown;
 	}
 }
