@@ -33,7 +33,6 @@ void AYeetable::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	if (Yate && OtherActor->GetClass() != APlayerPoltergeist::StaticClass())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, this->GetName() + " hit " + OtherActor->GetName());
 		if (!Victim) Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 		
 		Victim->ReceiveScare(GetActorLocation(), ScareStrength);

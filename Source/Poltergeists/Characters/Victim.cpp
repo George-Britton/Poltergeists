@@ -21,8 +21,7 @@ void AVictim::BeginPlay()
 
 	EnterNewRoom();
 
-	// TODO Make the victim run to different scare spots, more frequently with higher fear
-
+	
 	RoundStart();
 }
 

@@ -136,7 +136,6 @@ void APlayerPoltergeist::Pickup()
 				IsItemHeld = true;
 				ComponentHeld = HitResult.GetComponent();
 				ObjectBeingHeld = Cast<AYeetable>(HitResult.GetActor());
-				GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Blue, ObjectBeingHeld->GetName() + " picked up");
 			}
 		}
 	}
