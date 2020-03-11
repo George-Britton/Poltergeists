@@ -25,7 +25,8 @@ void ATrap::Tick(float DeltaTime)
 	if (TrapSet) TrapTime -= DeltaTime;
 	if (TrapTime <= 0.f)
 	{
-		Victim->UnSnare(this);
+		if (VictimTrapped) Victim->ReceiveUnsnare(this);
+		
 		OnDestroy.Broadcast();
 		Destroy();
 	}
@@ -37,15 +38,20 @@ void ATrap::NotifyActorBeginOverlap(AActor* OtherActor)
 	if (!Victim)
 	{
 		Victim = Cast<AVictim>(OtherActor);
-		if (Victim){ Victim->Snare(this); }
+		if (Victim)
+		{
+			Victim->ReceiveSnare(this);
+			VictimTrapped = true;
+		}
 	}
 }
 void ATrap::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	if (Victim == OtherActor)
 	{
-		Victim->UnSnare(this);
+		Victim->ReceiveUnsnare(this);
 		Victim = nullptr;
+		VictimTrapped = false;
 	}
 }
 

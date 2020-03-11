@@ -9,7 +9,7 @@ AVictim::AVictim()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	// Initialise the scare spots array
 	ScareSpots.Init(nullptr, 1);
 }
@@ -39,13 +39,7 @@ void AVictim::EnterNewRoom()
 	ScareSpots.Empty();
 	TArray<AActor*> ScareSpotFinderArray;
 	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-	for (auto ScareSpot : ScareSpotFinderArray)
-	{
-		ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
-	}
-
-	// Resets the fear for the new room
-	Fear = 50;
+	for (auto& ScareSpot : ScareSpotFinderArray) { ScareSpots.Add(Cast<AScareSpot>(ScareSpot)); }
 }
 
 // Called every frame
@@ -53,7 +47,7 @@ void AVictim::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Fear != 100) Fear = FMath::Clamp<float>(Fear -= FearDepletionSpeed * DeltaTime, 0, 100);
+	if (Fear < 100.f) FMath::Clamp<float>(Fear -= FearDepletionSpeed * DeltaTime, 0, 100);
 	else ReceiveRunAway();
 }
 
@@ -75,15 +69,15 @@ void AVictim::ReceiveScare(FVector ScareSource, float ScareStrength)
 }
 
 // Called when the victim is caught in a trap
-void AVictim::Snare(AActor* Trap)
+void AVictim::ReceiveSnare(ATrap* Trap)
 {
 	Trapped = true;
 	Traps.Add(Trap);
-	OnCaughtInTrap.Broadcast();
+	Snare(Trap);
 }
-void AVictim::UnSnare(AActor* Trap)
+void AVictim::ReceiveUnsnare(ATrap* Trap)
 {
 	Traps.Remove(Trap);
 	if (Traps.Num() == 0) Trapped = false;
-	OnFreedFromTrap.Broadcast();
+	Unsnare(Trap);
 }

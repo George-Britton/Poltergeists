@@ -5,12 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Scares/ScareSpot.h"
+#include "Abilities/Trap.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCaughtInTrap);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFreedFromTrap);
+class ATrap;
 
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
@@ -20,9 +19,9 @@ class POLTERGEISTS_API AVictim : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AVictim();
-
+	
 	// The current level of fear of the victim
-	UPROPERTY(BlueprintReadOnly, Category = "Fear")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
 		float Fear = 50.f;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
 		float FearDepletionSpeed = 5.f;
@@ -38,13 +37,7 @@ public:
 	// Whether the victim is caught in a trap
 	UPROPERTY(BlueprintReadOnly, Category = "Trap")
 		bool Trapped = false;
-		TArray<AActor*> Traps;
-
-	// Event Dispatcher for getting caught in a trap
-	UPROPERTY(BlueprintAssignable, Category = "Trap")
-		FOnCaughtInTrap OnCaughtInTrap;
-	UPROPERTY(BlueprintAssignable, Category = "Trap")
-		FOnFreedFromTrap OnFreedFromTrap;
+		TArray<ATrap*> Traps;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -72,6 +65,12 @@ public:
 		void Scare(FVector ScareSource, float ScareStrength);
 
 	// Called when the victim is caught in a trap
-	void Snare(AActor* Trap);
-	void UnSnare(AActor* Trap);
+	UFUNCTION(BlueprintCallable, Category = "Trap", DisplayName = "Snare")
+		void ReceiveSnare(ATrap* Trap);
+	UFUNCTION(BlueprintCallable, Category = "Trap", DisplayName = "UnSnare")
+		void ReceiveUnsnare(ATrap* Trap);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
+		void Snare(ATrap* Trap);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
+		void Unsnare(ATrap* Trap);
 };

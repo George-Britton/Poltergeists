@@ -7,6 +7,8 @@
 #include "Characters/Victim.h"
 #include "Trap.generated.h"
 
+class AVictim;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroy);
 
 UCLASS()
@@ -26,6 +28,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Trap")
 		float TrapTime = 0.f;
 		bool TrapSet = false;
+		bool VictimTrapped = false;
 
 	// The strength of the trap
 	UPROPERTY(BlueprintReadOnly, Category = "Trap")
