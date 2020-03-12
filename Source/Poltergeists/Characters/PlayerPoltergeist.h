@@ -94,7 +94,7 @@ public:
 		float SpecialCooldown = 10.f;
 		float SpecialCooldownTimer = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition="SpecialAbility == EPlayerAbility::CURSE"))
-		float CurseMultiplier = 3.f;
+		float CurseMultiplier = 2.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition = "SpecialAbility == EPlayerAbility::CURSE"))
 		float CurseTime = 30.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Touche", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TOUCHE"))
