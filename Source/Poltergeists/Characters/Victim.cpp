@@ -20,7 +20,6 @@ void AVictim::BeginPlay()
 	Super::BeginPlay();
 
 	EnterNewRoom();
-
 	
 	RoundStart();
 }
@@ -47,7 +46,11 @@ void AVictim::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (Fear < 100.f) FMath::Clamp<float>(Fear -= FearDepletionSpeed * DeltaTime, 0, 100);
-	else ReceiveRunAway();
+	else if (!RoundOver)
+	{
+		RoundOver = true;
+		ReceiveRunAway();
+	}
 }
 
 // Called when a scare spot is activated
