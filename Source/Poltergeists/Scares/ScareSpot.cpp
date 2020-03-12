@@ -38,16 +38,35 @@ void AScareSpot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Reduce active timer until scare stops
-	if (ActiveTimer > 0.f) FMath::Clamp<float>(ActiveTimer -= DeltaTime, 0, ActiveTime);
-
+	if (ActiveTimer > 0.f) ActiveTimer -= DeltaTime;
 	// Set usable again
 	if (ActiveTimer <= 0.f && ScareState == EScareState::ACTIVE) BeginRecharge();
 
-	// Reduce cooldown timer until available again
-	if (ScareState == EScareState::RECHARGING) FMath::Clamp<float>(RechargeTimer += DeltaTime, 0, RechargeTime);
-	
+	// Reduce cooldown timer until full power
+	if (ScareState == EScareState::RECHARGING) RechargeTimer += DeltaTime;
 	// Start the cooldown period
 	if (RechargeTimer >= RechargeTime && ScareState == EScareState::RECHARGING) ResetScareSpot();
+
+	// Count down the curse timer
+	if (CurseTimer > 0.f && IsCursed) CurseTimer -= DeltaTime;
+	else if (CurseTimer <= 0.f && IsCursed) Curse(0, 0);
+
+	// Count down the fuses for any time bombs on the scare spot
+	if (TimeBombFuses.Num() != 0) {
+		TArray<int32> FusesToRemove;
+		for (int32 Fuse = 0; Fuse < TimeBombFuses.Num(); ++Fuse)
+		{
+			TimeBombFuses[Fuse] -= DeltaTime;
+			if (TimeBombFuses[Fuse] <= 0.f)
+			{
+				ReceiveActivateScareSpot();
+				FusesToRemove.Add(Fuse);
+			}
+		}
+		for (auto& Fizzle : FusesToRemove) { TimeBombFuses.RemoveAt(Fizzle); }
+		FusesToRemove.Empty();
+	}
+	
 }
 
 // Called when the player activates the scare spot
@@ -87,4 +106,32 @@ void AScareSpot::ResetScareSpot()
 	ScareState = EScareState::READY;
 	RechargeTimer = RechargeTime;
 	OnScareReset();
+}
+
+// Called when the curse boi curses the scare spot
+bool AScareSpot::Curse(float Multiplier, float Time)
+{
+	if (!IsCursed)
+	{
+		IsCursed = true;
+		CurseTimer = Time;
+		CurseResetStrength = ScareStrength;
+		ScareStrength *= Multiplier;
+		return true;
+	}
+
+	if (CurseTimer <= 0.f)
+	{
+		IsCursed = false;
+		ScareStrength = CurseResetStrength;
+		return false;
+	}
+
+	return false;
+}
+
+// Called when the time bomb sets and explodes
+void AScareSpot::TimeBomb(float Time)
+{
+	TimeBombFuses.Add(Time);
 }

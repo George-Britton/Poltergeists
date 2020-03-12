@@ -4,6 +4,8 @@
 #include "PlayerPoltergeist.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Abilities/Trap.h"
+#include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -33,7 +35,9 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 	if (CooldownTimer > 0) FMath::Clamp<float>(CooldownTimer -= DeltaTime, 0, Cooldown);
 
 	// Reduce ability cooldowns
-	if (DashCooldownTimer > 0) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
+	if (DashCooldownTimer > 0.f) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
+	if (YeetCooldownTimer > 0.f) FMath::Clamp<float>(YeetCooldownTimer -= DeltaTime, 0, YeetCooldown);
+	if (SpecialCooldownTimer > 0.f) FMath::Clamp<float>(SpecialCooldownTimer -= DeltaTime, 0, SpecialCooldown);
 }
 
 // Called whenever the player overlaps with something or stops overlapping
@@ -41,10 +45,13 @@ void APlayerPoltergeist::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	AScareSpot* TestOverlap = Cast<AScareSpot>(OtherActor);
 	if (TestOverlap) OverlappedScareSpot = TestOverlap;
+
+	OverlappingVictim = Cast<AVictim>(OtherActor);
 }
 void APlayerPoltergeist::NotifyActorEndOverlap(AActor* OtherActor)
 {
 	if (OtherActor == OverlappedScareSpot) OverlappedScareSpot = nullptr;
+	if (OtherActor == OverlappingVictim) OverlappingVictim = nullptr;
 }
 
 // Called to bind functionality to input
@@ -63,8 +70,9 @@ void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &APlayerPoltergeist::Dash);
 	PlayerInputComponent->BindAction("Yeet", IE_Pressed, this, &APlayerPoltergeist::Pickup);
 	PlayerInputComponent->BindAction("Yeet", IE_Released, this, &APlayerPoltergeist::Yeet);
+	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &APlayerPoltergeist::Special);
 
-	// Keep the physics handle in front of the player
+	// Keep the physics handle in front of the player TODO Stretch goal: fix this and take out blueprint
 	//FVector ForwardVecHold = GetActorForwardVector() * ItemHeldDistance;
 	//if (IsItemHeld) PhysicsHandle->SetTargetLocation(ForwardVecHold + GetActorLocation());
 }
@@ -101,6 +109,7 @@ void APlayerPoltergeist::ReceiveActivateScare()
 // Input actions for abilities
 void APlayerPoltergeist::Dash()
 {
+	// Player dashes a certain amount in their forward direction
 	if (DashCooldownTimer <= 0.f)
 	{
 		ACharacter::LaunchCharacter(GetActorForwardVector() * DashSpeed, true, false);
@@ -110,6 +119,7 @@ void APlayerPoltergeist::Dash()
 }
 void APlayerPoltergeist::Pickup()
 {
+	// Box traces for a physics object and picks it up
 	if (!IsItemHeld)
 	{
 		FHitResult HitResult;
@@ -124,20 +134,80 @@ void APlayerPoltergeist::Pickup()
 			{
 				PhysicsHandle->GrabComponentAtLocation(HitResult.GetComponent(), "None", HitResult.GetComponent()->GetComponentLocation());
 				IsItemHeld = true;
-				ObjectBeingHeld = HitResult.GetComponent();
+				ComponentHeld = HitResult.GetComponent();
+				ObjectBeingHeld = Cast<AYeetable>(HitResult.GetActor());
 			}
 		}
 	}
 }
 void APlayerPoltergeist::Yeet()
 {
+	// Throws the held object
 	if (IsItemHeld)
 	{
 		IsItemHeld = false;
 		PhysicsHandle->ReleaseComponent();
 		FVector YeetDirection = GetActorForwardVector() * YeetStrength;
 		YeetDirection.Z += YeetIncline;
-		ObjectBeingHeld->AddImpulse(YeetDirection, "None", true);
+		ComponentHeld->AddImpulse(YeetDirection, "None", true);
+		ObjectBeingHeld->Yate = true;
+		ComponentHeld = nullptr;
+		ObjectBeingHeld = nullptr;
 		YeetCooldownTimer = YeetCooldown;
 	}
+}
+void APlayerPoltergeist::Special()
+{
+	// Checks which ability the player has and redirects to that function
+	if (SpecialCooldownTimer <= 0)
+		switch (SpecialAbility)
+		{
+		case EPlayerAbility::CURSE: Curse(); break;
+		case EPlayerAbility::TOUCHE: Touche(); break;
+		case EPlayerAbility::TIMEBOMB: TimeBomb(); break;
+		case EPlayerAbility::TRAP: Trap(); break;
+		default: break;
+		}
+}
+void APlayerPoltergeist::Curse()
+{
+	if (OverlappedScareSpot)
+	{
+		if (OverlappedScareSpot->Curse(CurseMultiplier, CurseTime)) { DeclareSpecialDone(); }
+	}
+}
+void APlayerPoltergeist::Touche()
+{
+	if (OverlappingVictim)
+	{
+		OverlappingVictim->ReceiveScare(GetActorLocation(), ToucheStrength);
+		DeclareSpecialDone();
+	}
+}
+void APlayerPoltergeist::TimeBomb()
+{
+	if (OverlappedScareSpot)
+	{
+		OverlappedScareSpot->TimeBomb(TimeBombDelay);
+		DeclareSpecialDone();
+	}
+}
+void APlayerPoltergeist::Trap()
+{
+	// Spawn a trap
+	FActorSpawnParameters SpawnParams;
+	FVector SpawnLoc = GetActorLocation();
+	SpawnLoc.Z -= GetDefaultHalfHeight();
+	ATrap* Trap = GetWorld()->SpawnActor<ATrap>(ATrap::StaticClass(), SpawnLoc, FRotator::ZeroRotator, SpawnParams);
+
+	// Set trap variables
+	Trap->SetMesh(TrapMesh);
+	Trap->StartCountdown(TrapTime);
+	Trap->TrapStrength = TrapStrength;
+	DeclareSpecialDone();
+}
+void APlayerPoltergeist::DeclareSpecialDone()
+{
+	SpecialCooldownTimer = SpecialCooldown;
+	OnSpecial.Broadcast();
 }

@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Scares/ScareSpot.h"
+#include "Abilities/Trap.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
+class ATrap;
 
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
@@ -17,9 +19,9 @@ class POLTERGEISTS_API AVictim : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AVictim();
-
+	
 	// The current level of fear of the victim
-	UPROPERTY(BlueprintReadOnly, Category = "Fear")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
 		float Fear = 50.f;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
 		float FearDepletionSpeed = 5.f;
@@ -32,6 +34,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
 
+	// Whether the victim is caught in a trap
+	UPROPERTY(BlueprintReadOnly, Category = "Trap")
+		bool Trapped = false;
+		TArray<ATrap*> Traps;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,4 +63,14 @@ public:
 		void ReceiveScare(FVector ScareSource, float ScareStrength);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Scare")
 		void Scare(FVector ScareSource, float ScareStrength);
+
+	// Called when the victim is caught in a trap
+	UFUNCTION(BlueprintCallable, Category = "Trap", DisplayName = "Snare")
+		void ReceiveSnare(ATrap* Trap);
+	UFUNCTION(BlueprintCallable, Category = "Trap", DisplayName = "UnSnare")
+		void ReceiveUnsnare(ATrap* Trap);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
+		void Snare(ATrap* Trap);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
+		void Unsnare(ATrap* Trap);
 };

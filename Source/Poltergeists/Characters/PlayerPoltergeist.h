@@ -8,13 +8,26 @@
 #include "Components/InputComponent.h"
 #include "Scares/ScareSpot.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Abilities/Yeetable.h"
 #include "PlayerPoltergeist.generated.h"
 
 class APlayerPoltergeist;
 
+// Enum for the player ability types
+UENUM()
+enum class EPlayerAbility : uint8
+{
+	TOUCHE UMETA(DisplayName="Touche"),
+	CURSE UMETA(DisplayName="Curse"),
+	TIMEBOMB UMETA(DisplayName="Time Bomb"),
+	TRAP UMETA(DisplayName="Trap"),
+	MAX
+};
+
 // Event delegate for the abilities
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnDash, APlayerPoltergeist, OnDash);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnYeet, APlayerPoltergeist, OnYeet);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE(FOnSpecial, APlayerPoltergeist, OnSpecial);
 
 UCLASS()
 class POLTERGEISTS_API APlayerPoltergeist : public ACharacter
@@ -39,7 +52,7 @@ public:
 	UPROPERTY()
 		float CooldownTimer = 0.f;
 
-	// Event Dispatchers for abilities
+	// Event Dispatchers and abilities variables
 	// Dash
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Dash")
 		FOnDash OnDash;
@@ -60,17 +73,41 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float YeetIncline = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
-		float YeetCooldown = 0.00001f;
+		float YeetCooldown = 5.f;
 		float YeetCooldownTimer = 0.f;
 	UPROPERTY(BlueprintReadWrite, Category = "Abilities|Yeet")
 		UPhysicsHandleComponent* PhysicsHandle;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		bool IsItemHeld = false;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
-		UPrimitiveComponent* ObjectBeingHeld;
+		UPrimitiveComponent* ComponentHeld;
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
+		AYeetable* ObjectBeingHeld;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float ItemHeldDistance = 50.f;
-	
+	// Special
+	UPROPERTY(BlueprintAssignable, Category = "Abilities|Special")
+		FOnSpecial OnSpecial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		EPlayerAbility SpecialAbility = EPlayerAbility::MAX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		float SpecialCooldown = 10.f;
+		float SpecialCooldownTimer = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition="SpecialAbility == EPlayerAbility::CURSE"))
+		float CurseMultiplier = 3.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition = "SpecialAbility == EPlayerAbility::CURSE"))
+		float CurseTime = 30.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Touche", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TOUCHE"))
+		float ToucheStrength = 80.f;
+		AVictim* OverlappingVictim;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|TimeBomb", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TIMEBOMB"))
+		float TimeBombDelay = 3.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
+		float TrapStrength = 2.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
+		float TrapTime = 4.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
+		UStaticMesh* TrapMesh;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -98,7 +135,13 @@ public:
 		void ActivateScare();
 
 	// Input actions for abilities
-		void Dash();
-		void Pickup();
-		void Yeet();
+	void Dash();
+	void Pickup();
+	void Yeet();
+	void Special();
+	void Touche();
+	void Trap();
+	void TimeBomb();
+	void Curse();
+	void DeclareSpecialDone();
 };
