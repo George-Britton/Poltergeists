@@ -47,9 +47,9 @@ public:
 		AScareSpot* OverlappedScareSpot;
 
 	// Time it takes for the player's scare ability to cooldown
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scares")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
 		float Cooldown = 3.f;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		float CooldownTimer = 0.f;
 
 	// Event Dispatchers and abilities variables
@@ -62,6 +62,7 @@ public:
 		float DashTimeInSeconds = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
 		float DashCooldown = 5.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Dash")
 		float DashCooldownTimer = 0.f;
 	// Yeet
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Yeet")
@@ -74,6 +75,7 @@ public:
 		float YeetIncline = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float YeetCooldown = 5.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		float YeetCooldownTimer = 0.f;
 	UPROPERTY(BlueprintReadWrite, Category = "Abilities|Yeet")
 		UPhysicsHandleComponent* PhysicsHandle;
@@ -92,6 +94,7 @@ public:
 		EPlayerAbility SpecialAbility = EPlayerAbility::MAX;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		float SpecialCooldown = 10.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
 		float SpecialCooldownTimer = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition="SpecialAbility == EPlayerAbility::CURSE"))
 		float CurseMultiplier = 2.f;

@@ -120,7 +120,7 @@ void APlayerPoltergeist::Dash()
 void APlayerPoltergeist::Pickup()
 {
 	// Box traces for a physics object and picks it up
-	if (!IsItemHeld)
+	if (!IsItemHeld && YeetCooldownTimer <= 0.f)
 	{
 		FHitResult HitResult;
 		FVector TraceToLocation = GetActorForwardVector() * PickupDistance + GetActorLocation();
@@ -159,7 +159,7 @@ void APlayerPoltergeist::Yeet()
 void APlayerPoltergeist::Special()
 {
 	// Checks which ability the player has and redirects to that function
-	if (SpecialCooldownTimer <= 0)
+	if (SpecialCooldownTimer <= 0.f)
 		switch (SpecialAbility)
 		{
 		case EPlayerAbility::CURSE: Curse(); break;
