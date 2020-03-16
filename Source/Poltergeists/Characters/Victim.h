@@ -38,6 +38,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Trap")
 		bool Trapped = false;
 		TArray<ATrap*> Traps;
+
+	// Marks the end of the round
+	UPROPERTY(BlueprintReadOnly, Category = "Fear")
+		bool RoundOver = false;
 	
 protected:
 	// Called when the game starts or when spawned

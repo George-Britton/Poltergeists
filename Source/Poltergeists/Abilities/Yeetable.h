@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* MeshComponent;
 
-	// Yate - a yeet, a paste tense yeet
+	// Yate - a yeet, a past tense yeet
 	UPROPERTY(BlueprintReadOnly, Category = "Yeet")
 		bool Yate = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Yeet")
