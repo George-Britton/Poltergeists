@@ -38,7 +38,7 @@ void AScareSpot::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Reduce active timer until scare stops
-	if (ActiveTimer > 0.f) ActiveTimer -= DeltaTime;
+	if (ActiveTimer > 0.f) FMath::Clamp<float>(ActiveTimer -= DeltaTime, 0, ActiveTime);
 	// Set usable again
 	if (ActiveTimer <= 0.f && ScareState == EScareState::ACTIVE) BeginRecharge();
 
