@@ -17,9 +17,9 @@ void AScareSpotRandomiser::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ScareSpots.Num())
+	if (ScareSpots.Num() != 0)
 	{
-		int32 SpawnNum = UKismetMathLibrary::RandomIntegerInRange(0, ScareSpots.Num());
+		int32 SpawnNum = UKismetMathLibrary::RandomIntegerInRange(0, ScareSpots.Num() - 1);
 		FActorSpawnParameters SpawnParams;
 		FVector SpawnLoc = GetActorLocation();
 		FRotator SpawnRot = GetActorRotation();
