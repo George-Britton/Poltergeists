@@ -19,7 +19,7 @@ void AVictim::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EnterNewRoom();
+	ReceiveEnterNewRoom();
 	
 	RoundStart();
 }
@@ -31,13 +31,16 @@ void AVictim::ReceiveRunAway()
 }
 
 // Called when the victim enters a new room / level
-void AVictim::EnterNewRoom()
+void AVictim::ReceiveEnterNewRoom()
 {
 	// Gets all the scare spots, and fills the array
 	ScareSpots.Empty();
+	if (Room) Room->Destroy();
+	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
 	TArray<AActor*> ScareSpotFinderArray;
 	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-	for (auto& ScareSpot : ScareSpotFinderArray) { ScareSpots.Add(Cast<AScareSpot>(ScareSpot)); }
+	for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
+	EnterNewRoom();
 }
 
 // Called every frame

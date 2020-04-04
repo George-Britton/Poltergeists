@@ -42,6 +42,12 @@ public:
 	// Marks the end of the round
 	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		bool RoundOver = false;
+
+	// The room to despawn on new round start
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
+		TSubclassOf<AActor> RoomClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Room")
+		AActor* Room;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -56,6 +62,9 @@ protected:
 		void RunAway();
 
 	// Called when the victim enters a new room / level
+	UFUNCTION(BlueprintCallable, Category = "Room", DisplayName = "EnterNewRoom")
+	void ReceiveEnterNewRoom();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Room")
 	void EnterNewRoom();
 
 public:
