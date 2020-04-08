@@ -3,6 +3,7 @@
 #include "Victim.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Polterguys.h"
 
 // Sets default values
 AVictim::AVictim()
@@ -21,12 +22,14 @@ void AVictim::BeginPlay()
 
 	ReceiveEnterNewRoom();
 	
-	RoundStart();
+	ReceiveRoundStart();
 }
 
 // Called when the fear meter is full
 void AVictim::ReceiveRunAway()
 {
+	OnRunAway.Broadcast();
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "ReceiveRunAway");
 	RunAway();
 }
 
@@ -54,6 +57,13 @@ void AVictim::Tick(float DeltaTime)
 		RoundOver = true;
 		ReceiveRunAway();
 	}
+}
+
+// Called when the game is ready for the next room to begin
+void AVictim::ReceiveRoundStart()
+{
+	OnRoundStart.Broadcast();
+	RoundStart();
 }
 
 // Called when a scare spot is activated

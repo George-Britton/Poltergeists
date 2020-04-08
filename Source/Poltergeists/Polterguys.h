@@ -16,8 +16,16 @@ class POLTERGEISTS_API APolterguys : public AGameModeBase
 
 public:
 
+	// Room classes
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rooms")
+		TArray<TSubclassOf<AActor>> RoomClassArray;
+	
+	// Called when the victim runs away at full fear
+	UFUNCTION()
+	void OnVictimRunAway();
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 };

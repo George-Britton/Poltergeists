@@ -6,10 +6,14 @@
 #include "GameFramework/Character.h"
 #include "Scares/ScareSpot.h"
 #include "Abilities/Trap.h"
+#include "Rooms/Door.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
 class ATrap;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRunAway);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundStart);
 
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
@@ -43,15 +47,31 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		bool RoundOver = false;
 
+	// The door that the victim runs to at the end of the round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		ADoor* Door;
+
 	// The room to despawn on new round start
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
 		TSubclassOf<AActor> RoomClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Room")
 		AActor* Room;
+
+	// Event dispatcher for when the victim runs for the next room
+	UPROPERTY(BlueprintAssignable)
+		FOnRunAway OnRunAway;
+
+	// Event dispatcher for when the next round starts
+	UPROPERTY(BlueprintAssignable)
+		FOnRunAway OnRoundStart;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called when the game is ready for the next room to begin
+	UFUNCTION(BlueprintCallable, Category = "Events", DisplayName = "RoundStart")
+		void ReceiveRoundStart();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void RoundStart();
 
