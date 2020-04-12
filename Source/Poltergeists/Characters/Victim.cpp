@@ -29,20 +29,35 @@ void AVictim::BeginPlay()
 void AVictim::ReceiveRunAway()
 {
 	OnRunAway.Broadcast();
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "ReceiveRunAway");
 	RunAway();
 }
 
 // Called when the victim enters a new room / level
 void AVictim::ReceiveEnterNewRoom()
 {
-	// Gets all the scare spots, and fills the array
-	ScareSpots.Empty();
-	if (Room) Room->Destroy();
-	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
-	TArray<AActor*> ScareSpotFinderArray;
-	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-	for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
+	if (Round > 0)
+	{
+		// Gets all the scare spots, and fills the array
+		ScareSpots.Empty();
+		if (Room) Room->Destroy();
+
+		TSubclassOf<AActor> RoomClass;
+		for (int32 RoomClassFinder = 0; RoomClassFinder < RoomArray.Num(); ++RoomClassFinder)
+		{
+			if (UGameplayStatics::GetActorOfClass(this, RoomArray[RoomClassFinder]) != nullptr)
+			{
+				RoomClass = RoomArray[RoomClassFinder];
+				break;
+			}
+		}
+		Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
+		
+		TArray<AActor*> ScareSpotFinderArray;
+		UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
+		for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
+		Fear = StartingFear;
+	}
+	++Round;
 	EnterNewRoom();
 }
 
@@ -62,6 +77,7 @@ void AVictim::Tick(float DeltaTime)
 // Called when the game is ready for the next room to begin
 void AVictim::ReceiveRoundStart()
 {
+	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
 	OnRoundStart.Broadcast();
 	RoundStart();
 }
@@ -95,4 +111,13 @@ void AVictim::ReceiveUnsnare(ATrap* Trap)
 	Traps.Remove(Trap);
 	if (Traps.Num() == 0) Trapped = false;
 	Unsnare(Trap);
+}
+
+// Called when the victim needs to choose a new scare spot to run to
+AScareSpot* AVictim::GetRandomScareSpot()
+{
+	if (ScareSpots.Num() != 0)
+		return ScareSpots[FMath::RandRange(0, ScareSpots.Num() - 1)];
+
+	return nullptr;
 }

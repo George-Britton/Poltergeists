@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/Trap.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
@@ -24,6 +26,11 @@ APlayerPoltergeist::APlayerPoltergeist()
 void APlayerPoltergeist::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Sets the victim and binds the event listeners for the round timers
+	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
+	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
+	Victim->OnRoundStart.AddDynamic(this,  &APlayerPoltergeist::OnRoundStart);
 }
 
 // Called every frame
@@ -38,6 +45,14 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 	if (DashCooldownTimer > 0.f) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
 	if (YeetCooldownTimer > 0.f) FMath::Clamp<float>(YeetCooldownTimer -= DeltaTime, 0, YeetCooldown);
 	if (SpecialCooldownTimer > 0.f) FMath::Clamp<float>(SpecialCooldownTimer -= DeltaTime, 0, SpecialCooldown);
+
+	// Sends the player into the next room
+	if (Chasing)
+	{
+		FVector DeltaLoc = FVector((RunToLocation - GetActorLocation()).Normalize());
+		AddActorWorldOffset(DeltaLoc  * ChaseSpeed);
+		SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Victim->GetActorLocation()));
+	}
 }
 
 // Called whenever the player overlaps with something or stops overlapping
@@ -58,7 +73,7 @@ void APlayerPoltergeist::NotifyActorEndOverlap(AActor* OtherActor)
 void APlayerPoltergeist::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 	// Bind player movement
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerPoltergeist::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerPoltergeist::MoveRight);
@@ -210,4 +225,18 @@ void APlayerPoltergeist::DeclareSpecialDone()
 {
 	SpecialCooldownTimer = SpecialCooldown;
 	OnSpecial.Broadcast();
+}
+
+// Called when the AI runs away
+void APlayerPoltergeist::OnRunAway()
+{
+	GetCharacterMovement()->StopMovementImmediately();
+	DisableInput(Cast<APlayerController>(GetController()));
+	Chasing = true;
+}
+// Called when the AI starts the next round
+void APlayerPoltergeist::OnRoundStart()
+{
+	EnableInput(Cast<APlayerController>(GetController()));
+	Chasing = false;
 }

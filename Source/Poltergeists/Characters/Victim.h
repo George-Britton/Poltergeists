@@ -26,6 +26,8 @@ public:
 	
 	// The current level of fear of the victim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
+		float StartingFear = 50.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		float Fear = 50.f;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
 		float FearDepletionSpeed = 5.f;
@@ -46,14 +48,16 @@ public:
 	// Marks the end of the round
 	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		bool RoundOver = false;
-
+	UPROPERTY(BlueprintReadOnly, Category = "Rounds")
+		int32 Round = 0;
+	
 	// The door that the victim runs to at the end of the round
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		ADoor* Door;
 
 	// The room to despawn on new round start
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
-		TSubclassOf<AActor> RoomClass;
+		TArray<TSubclassOf<AActor>> RoomArray;
 	UPROPERTY(BlueprintReadOnly, Category = "Room")
 		AActor* Room;
 
@@ -106,4 +110,8 @@ public:
 		void Snare(ATrap* Trap);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
 		void Unsnare(ATrap* Trap);
+
+	// Called when the victim needs to choose a new scare spot to run to
+	UFUNCTION(BlueprintCallable, Category = "Scare")
+		AScareSpot* GetRandomScareSpot();
 };

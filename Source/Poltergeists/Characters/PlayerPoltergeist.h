@@ -42,6 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		ACameraActor* PlayerCamera;
 
+	// The victim
+	UPROPERTY(BlueprintReadOnly, Category = Victim)
+		AVictim* Victim;
+	
 	// Overlapped scare spot
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		AScareSpot* OverlappedScareSpot;
@@ -111,6 +115,13 @@ public:
 		float TrapTime = 4.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
+
+	// Used to chase the AI to the next room
+		bool Chasing = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
+		float ChaseSpeed = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
+		FVector RunToLocation = FVector::ZeroVector;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -147,4 +158,11 @@ public:
 	void TimeBomb();
 	void Curse();
 	void DeclareSpecialDone();
+
+	// Called when the AI runs away
+	UFUNCTION()
+		void OnRunAway();
+	// Called when the AI starts the next round
+	UFUNCTION()
+		void OnRoundStart();
 };
