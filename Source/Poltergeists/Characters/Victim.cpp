@@ -35,9 +35,9 @@ void AVictim::ReceiveRunAway()
 // Called when the victim enters a new room / level
 void AVictim::ReceiveEnterNewRoom()
 {
+	// Destroys the room and registers the next one
 	if (Round > 0)
 	{
-		// Gets all the scare spots, and fills the array
 		ScareSpots.Empty();
 		if (Room) Room->Destroy();
 
@@ -52,11 +52,14 @@ void AVictim::ReceiveEnterNewRoom()
 		}
 		Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
 		
-		TArray<AActor*> ScareSpotFinderArray;
-		UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-		for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
 		Fear = StartingFear;
 	}
+
+	// Gets all the scare spots in the room
+	TArray<AActor*> ScareSpotFinderArray;
+	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
+	for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
+	
 	++Round;
 	EnterNewRoom();
 }
@@ -77,6 +80,7 @@ void AVictim::Tick(float DeltaTime)
 // Called when the game is ready for the next room to begin
 void AVictim::ReceiveRoundStart()
 {
+	
 	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
 	OnRoundStart.Broadcast();
 	RoundStart();

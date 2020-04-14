@@ -2,9 +2,15 @@
 
 
 #include "PlayerPoltergeist.h"
+
+
+#include "Abilities/CurseAbilityComponent.h"
+#include "Abilities/TimeBombAbilityComponent.h"
+#include "Abilities/ToucheAbilityComponent.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/Trap.h"
+#include "Abilities/TrapAbilityComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -16,7 +22,7 @@ APlayerPoltergeist::APlayerPoltergeist()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Physics Handle"));
-
+	
 	// Allow the player to rotate towards their movement vector
 	GetCharacterMovement()->bOrientRotationToMovement = 1;
 	bUseControllerRotationYaw = false;
@@ -27,6 +33,18 @@ void APlayerPoltergeist::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Sets the special ability component
+	const FTransform SpecialTransform;
+	switch(SpecialAbility)
+	{
+	case EPlayerAbility::TOUCHE: SpecialComponent = Cast<UToucheAbilityComponent>(StaticConstructObject_Internal(UToucheAbilityComponent::StaticClass(), this)); break;
+	case EPlayerAbility::CURSE: SpecialComponent = Cast<UCurseAbilityComponent>(StaticConstructObject_Internal(UCurseAbilityComponent::StaticClass(), this)); break;
+	case EPlayerAbility::TIMEBOMB: SpecialComponent = Cast<UTimeBombAbilityComponent>(StaticConstructObject_Internal(UTimeBombAbilityComponent::StaticClass(), this)); break;
+	case EPlayerAbility::TRAP: SpecialComponent = Cast<UTrapAbilityComponent>(StaticConstructObject_Internal(UTrapAbilityComponent::StaticClass(), this)); break;
+	default: break;
+	}
+	SpecialComponent->RegisterComponent();
+	
 	// Sets the victim and binds the event listeners for the round timers
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
@@ -173,53 +191,7 @@ void APlayerPoltergeist::Yeet()
 }
 void APlayerPoltergeist::Special()
 {
-	// Checks which ability the player has and redirects to that function
-	if (SpecialCooldownTimer <= 0.f)
-		switch (SpecialAbility)
-		{
-		case EPlayerAbility::CURSE: Curse(); break;
-		case EPlayerAbility::TOUCHE: Touche(); break;
-		case EPlayerAbility::TIMEBOMB: TimeBomb(); break;
-		case EPlayerAbility::TRAP: Trap(); break;
-		default: break;
-		}
-}
-void APlayerPoltergeist::Curse()
-{
-	if (OverlappedScareSpot)
-	{
-		if (OverlappedScareSpot->Curse(CurseMultiplier, CurseTime)) { DeclareSpecialDone(); }
-	}
-}
-void APlayerPoltergeist::Touche()
-{
-	if (OverlappingVictim)
-	{
-		OverlappingVictim->ReceiveScare(GetActorLocation(), ToucheStrength);
-		DeclareSpecialDone();
-	}
-}
-void APlayerPoltergeist::TimeBomb()
-{
-	if (OverlappedScareSpot)
-	{
-		OverlappedScareSpot->TimeBomb(TimeBombDelay);
-		DeclareSpecialDone();
-	}
-}
-void APlayerPoltergeist::Trap()
-{
-	// Spawn a trap
-	FActorSpawnParameters SpawnParams;
-	FVector SpawnLoc = GetActorLocation();
-	SpawnLoc.Z -= GetDefaultHalfHeight();
-	ATrap* Trap = GetWorld()->SpawnActor<ATrap>(ATrap::StaticClass(), SpawnLoc, FRotator::ZeroRotator, SpawnParams);
-
-	// Set trap variables
-	Trap->SetMesh(TrapMesh);
-	Trap->StartCountdown(TrapTime);
-	Trap->TrapStrength = TrapStrength;
-	DeclareSpecialDone();
+	if (!SpecialCooldownTimer) SpecialComponent->Execute();
 }
 void APlayerPoltergeist::DeclareSpecialDone()
 {

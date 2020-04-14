@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Abilities/SpecialAbilityComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraActor.h"
@@ -41,7 +42,7 @@ public:
 	// Camera for this player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		ACameraActor* PlayerCamera;
-
+	
 	// The victim
 	UPROPERTY(BlueprintReadOnly, Category = Victim)
 		AVictim* Victim;
@@ -94,28 +95,18 @@ public:
 	// Special
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Special")
 		FOnSpecial OnSpecial;
+	UPROPERTY()
+		class USpecialAbilityComponent* SpecialComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		EPlayerAbility SpecialAbility = EPlayerAbility::MAX;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		float SpecialCooldown = 10.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
 		float SpecialCooldownTimer = 0.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition="SpecialAbility == EPlayerAbility::CURSE"))
-		float CurseMultiplier = 2.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition = "SpecialAbility == EPlayerAbility::CURSE"))
-		float CurseTime = 30.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Touche", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TOUCHE"))
-		float ToucheStrength = 80.f;
 		AVictim* OverlappingVictim;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|TimeBomb", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TIMEBOMB"))
-		float TimeBombDelay = 3.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
-		float TrapStrength = 2.5f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
-		float TrapTime = 4.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Abilities|Special", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
-
+	
 	// Used to chase the AI to the next room
 		bool Chasing = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
@@ -153,10 +144,8 @@ public:
 	void Pickup();
 	void Yeet();
 	void Special();
-	void Touche();
 	void Trap();
 	void TimeBomb();
-	void Curse();
 	void DeclareSpecialDone();
 
 	// Called when the AI runs away
