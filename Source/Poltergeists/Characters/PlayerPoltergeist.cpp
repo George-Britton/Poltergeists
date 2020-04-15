@@ -9,7 +9,6 @@
 #include "Abilities/ToucheAbilityComponent.h"
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Abilities/Trap.h"
 #include "Abilities/TrapAbilityComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -63,14 +62,6 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 	if (DashCooldownTimer > 0.f) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
 	if (YeetCooldownTimer > 0.f) FMath::Clamp<float>(YeetCooldownTimer -= DeltaTime, 0, YeetCooldown);
 	if (SpecialCooldownTimer > 0.f) FMath::Clamp<float>(SpecialCooldownTimer -= DeltaTime, 0, SpecialCooldown);
-
-	// Sends the player into the next room
-	if (Chasing)
-	{
-		FVector DeltaLoc = FVector((RunToLocation - GetActorLocation()).Normalize());
-		AddActorWorldOffset(DeltaLoc  * ChaseSpeed);
-		SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Victim->GetActorLocation()));
-	}
 }
 
 // Called whenever the player overlaps with something or stops overlapping
@@ -204,11 +195,12 @@ void APlayerPoltergeist::OnRunAway()
 {
 	GetCharacterMovement()->StopMovementImmediately();
 	DisableInput(Cast<APlayerController>(GetController()));
-	Chasing = true;
+	ChaseState = EChaseState::FADING_OUT;
 }
 // Called when the AI starts the next round
 void APlayerPoltergeist::OnRoundStart()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "Player OnRoundStart");
 	EnableInput(Cast<APlayerController>(GetController()));
-	Chasing = false;
+	ChaseState = EChaseState::PLAYING;
 }

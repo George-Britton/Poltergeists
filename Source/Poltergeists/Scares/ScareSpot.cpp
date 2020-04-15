@@ -32,6 +32,13 @@ void AScareSpot::OnConstruction(const FTransform& Transform)
 	RechargeTimer = RechargeTime;
 }
 
+// Called when the game is ready for the next room to begin
+void AScareSpot::BeginPlay()
+{
+	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
+	Victim->OnRoundStart.AddDynamic(this, & AScareSpot::OnRoundStart);
+}
+
 // Called every frame
 void AScareSpot::Tick(float DeltaTime)
 {
@@ -74,10 +81,7 @@ bool AScareSpot::ReceiveActivateScareSpot()
 {
 	// Scares the victim if possible
 	if (ScareState == EScareState::READY || ScareState == EScareState::RECHARGING)
-	{
-		// Sets the victim if it doesn't already exist
-		if (!Victim) Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
-		
+	{		
 		ScareState = EScareState::ACTIVE;
 		ActiveTimer = ActiveTime;
 		ActivateScareSpot();
@@ -134,4 +138,10 @@ bool AScareSpot::Curse(float Multiplier, float Time)
 void AScareSpot::TimeBomb(float Time)
 {
 	TimeBombFuses.Add(Time);
+}
+
+// Called when the victim starts the round
+void AScareSpot::OnRoundStart()
+{
+	Victim->ScareSpots.Add(this);
 }

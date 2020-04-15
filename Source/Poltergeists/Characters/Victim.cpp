@@ -54,11 +54,6 @@ void AVictim::ReceiveEnterNewRoom()
 		
 		Fear = StartingFear;
 	}
-
-	// Gets all the scare spots in the room
-	TArray<AActor*> ScareSpotFinderArray;
-	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-	for (auto& ScareSpot : ScareSpotFinderArray) ScareSpots.Add(Cast<AScareSpot>(ScareSpot));
 	
 	++Round;
 	EnterNewRoom();
@@ -69,7 +64,11 @@ void AVictim::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Fear < 100.f) FMath::Clamp<float>(Fear -= FearDepletionSpeed * DeltaTime, 0, 100);
+	if (Fear < 100.f && Fear > 0.f)
+	{
+		Fear -= FearDepletionSpeed * DeltaTime;
+		FMath::Clamp<float>(Fear, 0, 100);
+	}
 	else if (!RoundOver)
 	{
 		RoundOver = true;

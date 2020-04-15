@@ -90,10 +90,14 @@ public:
 
 	// The timers for the time bomb
 	TArray<float> TimeBombFuses;
+
+	// Called when the game is ready for the next room to begin
+	virtual void BeginPlay() override;
 	
 protected:
 	// Called whenever a value is changed
 	void OnConstruction(const FTransform& Transform) override;
+
 	
 public:	
 	// Called every frame
@@ -125,4 +129,7 @@ public:
 		bool Curse(float Multiplier, float Time);
 	// Called when the time bomb sets and explodes
 		void TimeBomb(float Time);
+
+	// Called when the victim starts the round
+		void OnRoundStart();
 };

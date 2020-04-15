@@ -6,13 +6,24 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraActor.h"
-#include "Components/InputComponent.h"
 #include "Scares/ScareSpot.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Abilities/Yeetable.h"
 #include "PlayerPoltergeist.generated.h"
 
 class APlayerPoltergeist;
+
+// Enum for the inter-room chasing
+UENUM(BlueprintType)
+enum class EChaseState : uint8
+{
+	FADING_IN UMETA(DisplayName="Fading In"),
+	FADING_OUT UMETA(DisplayName="Fading Out"),
+	MOVING UMETA(DisplayName="Moving"),
+	WAITING UMETA(DisplayName="Waiting"),
+	PLAYING UMETA(DisplayName="Playing"),
+	MAX
+};
 
 // Enum for the player ability types
 UENUM()
@@ -103,14 +114,14 @@ public:
 		float SpecialCooldown = 10.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
 		float SpecialCooldownTimer = 0.f;
+	UPROPERTY()
 		AVictim* OverlappingVictim;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Abilities|Special", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
 	
 	// Used to chase the AI to the next room
-		bool Chasing = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
-		float ChaseSpeed = 10.f;
+		EChaseState ChaseState = EChaseState::PLAYING;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
 		FVector RunToLocation = FVector::ZeroVector;
 	
