@@ -34,20 +34,13 @@ void AVictim::ReceiveRunAway()
 void AVictim::ReceiveEnterNewRoom()
 {
 	// Destroys the room and resets the fear
-	if (Round > 0)
-	{
-		ScareSpots.Empty();
-		if (Room) Room->Destroy();
-		if (Door) Door->Destroy();
-		
-		Fear = StartingFear;
-	}
-
+	Fear = StartingFear;
+	OnEnterNewRoom.Broadcast();
+	
 	// Registers the new room and increments the round
 	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
 	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
-
-	OnEnterNewRoom.Broadcast();
+	
 	EnterNewRoom();
 	ReceiveRoundStart();
 }
@@ -57,7 +50,7 @@ void AVictim::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Fear < 100.f && Fear > 0.f)
+	if (Fear < 100.f && Fear > 0.f && !RoundOver)
 	{
 		Fear -= FearDepletionSpeed * DeltaTime;
 		FMath::Clamp<float>(Fear, 0, 100);
@@ -73,6 +66,7 @@ void AVictim::Tick(float DeltaTime)
 void AVictim::ReceiveRoundStart()
 {
 	++Round;
+	RoundOver = false;
 	OnRoundStart.Broadcast();
 	RoundStart();
 }

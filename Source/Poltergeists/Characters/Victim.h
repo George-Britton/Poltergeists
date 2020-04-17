@@ -61,6 +61,8 @@ public:
 		TSubclassOf<AActor> RoomClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Room")
 		AActor* Room;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		FVector StartLocation;
 
 	// Event dispatcher for when the victim runs for the next room
 	UPROPERTY(BlueprintAssignable)

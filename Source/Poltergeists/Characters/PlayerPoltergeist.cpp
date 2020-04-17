@@ -198,7 +198,6 @@ void APlayerPoltergeist::OnRunAway()
 // Called when the AI starts the next round
 void APlayerPoltergeist::OnRoundStart()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, "Player OnRoundStart");
 	EnableInput(Cast<APlayerController>(GetController()));
 	ChaseState = EChaseState::PLAYING;
 }
