@@ -21,8 +21,6 @@ void AVictim::BeginPlay()
 	Super::BeginPlay();
 
 	ReceiveEnterNewRoom();
-	
-	ReceiveRoundStart();
 }
 
 // Called when the fear meter is full
@@ -35,28 +33,23 @@ void AVictim::ReceiveRunAway()
 // Called when the victim enters a new room / level
 void AVictim::ReceiveEnterNewRoom()
 {
-	// Destroys the room and registers the next one
+	// Destroys the room and resets the fear
 	if (Round > 0)
 	{
 		ScareSpots.Empty();
 		if (Room) Room->Destroy();
-
-		TSubclassOf<AActor> RoomClass;
-		for (int32 RoomClassFinder = 0; RoomClassFinder < RoomArray.Num(); ++RoomClassFinder)
-		{
-			if (UGameplayStatics::GetActorOfClass(this, RoomArray[RoomClassFinder]) != nullptr)
-			{
-				RoomClass = RoomArray[RoomClassFinder];
-				break;
-			}
-		}
-		Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
+		if (Door) Door->Destroy();
 		
 		Fear = StartingFear;
 	}
-	
-	++Round;
+
+	// Registers the new room and increments the round
+	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
+	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
+
+	OnEnterNewRoom.Broadcast();
 	EnterNewRoom();
+	ReceiveRoundStart();
 }
 
 // Called every frame
@@ -69,7 +62,7 @@ void AVictim::Tick(float DeltaTime)
 		Fear -= FearDepletionSpeed * DeltaTime;
 		FMath::Clamp<float>(Fear, 0, 100);
 	}
-	else if (!RoundOver)
+	else if (!RoundOver && Fear >= 100)
 	{
 		RoundOver = true;
 		ReceiveRunAway();
@@ -79,8 +72,7 @@ void AVictim::Tick(float DeltaTime)
 // Called when the game is ready for the next room to begin
 void AVictim::ReceiveRoundStart()
 {
-	
-	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
+	++Round;
 	OnRoundStart.Broadcast();
 	RoundStart();
 }

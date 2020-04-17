@@ -14,6 +14,7 @@ class ATrap;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRunAway);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterNewRoom);
 
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
@@ -57,7 +58,7 @@ public:
 
 	// The room to despawn on new round start
 	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
-		TArray<TSubclassOf<AActor>> RoomArray;
+		TSubclassOf<AActor> RoomClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Room")
 		AActor* Room;
 
@@ -65,6 +66,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 		FOnRunAway OnRunAway;
 
+	// Event dispatcher for when the victim enters the new room
+	UPROPERTY(BlueprintAssignable)
+		FOnEnterNewRoom OnEnterNewRoom;
+	
 	// Event dispatcher for when the next round starts
 	UPROPERTY(BlueprintAssignable)
 		FOnRunAway OnRoundStart;
