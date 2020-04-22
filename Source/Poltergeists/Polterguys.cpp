@@ -8,13 +8,11 @@
 
 void APolterguys::BeginPlay()
 {
-	// Counts how many players there are, and spawns controllers for them all
-	TArray<AActor*> Players;
-	UGameplayStatics::GetAllActorsOfClass(this, APlayerPoltergeist::StaticClass(), Players);
-	for (auto& Player : Players) { UGameplayStatics::CreatePlayer(this); }
-
-	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
-	Victim->OnRunAway.AddDynamic(this, &APolterguys::OnVictimRunAway);
+	if (GetWorld()->GetName() != "MenuMap" && GetWorld()->GetName() != "EndMap")
+	{
+		Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
+		Victim->OnRunAway.AddDynamic(this, &APolterguys::OnVictimRunAway);
+	}
 }
 
 // Called when the victim runs away at full fear

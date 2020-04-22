@@ -46,6 +46,7 @@ void APlayerPoltergeist::BeginPlay()
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
 	Victim->OnRoundStart.AddDynamic(this,  &APlayerPoltergeist::OnRoundStart);
+
 }
 
 // Called every frame
