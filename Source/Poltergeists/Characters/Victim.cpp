@@ -3,6 +3,7 @@
 #include "Victim.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Polterguys.h"
 
 // Sets default values
 AVictim::AVictim()
@@ -19,25 +20,29 @@ void AVictim::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EnterNewRoom();
-	
-	RoundStart();
+	ReceiveEnterNewRoom();
 }
 
 // Called when the fear meter is full
 void AVictim::ReceiveRunAway()
 {
+	OnRunAway.Broadcast();
 	RunAway();
 }
 
 // Called when the victim enters a new room / level
-void AVictim::EnterNewRoom()
+void AVictim::ReceiveEnterNewRoom()
 {
-	// Gets all the scare spots, and fills the array
-	ScareSpots.Empty();
-	TArray<AActor*> ScareSpotFinderArray;
-	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), ScareSpotFinderArray);
-	for (auto& ScareSpot : ScareSpotFinderArray) { ScareSpots.Add(Cast<AScareSpot>(ScareSpot)); }
+	// Destroys the room and resets the fear
+	Fear = StartingFear;
+	OnEnterNewRoom.Broadcast();
+	
+	// Registers the new room and increments the round
+	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
+	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
+	
+	EnterNewRoom();
+	ReceiveRoundStart();
 }
 
 // Called every frame
@@ -45,12 +50,25 @@ void AVictim::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Fear < 100.f) FMath::Clamp<float>(Fear -= FearDepletionSpeed * DeltaTime, 0, 100);
-	else if (!RoundOver)
+	if (Fear < 100.f && Fear > 0.f && !RoundOver)
+	{
+		Fear -= FearDepletionSpeed * DeltaTime;
+		FMath::Clamp<float>(Fear, 0, 100);
+	}
+	else if (!RoundOver && Fear >= 100)
 	{
 		RoundOver = true;
 		ReceiveRunAway();
 	}
+}
+
+// Called when the game is ready for the next room to begin
+void AVictim::ReceiveRoundStart()
+{
+	++Round;
+	RoundOver = false;
+	OnRoundStart.Broadcast();
+	RoundStart();
 }
 
 // Called when a scare spot is activated
@@ -82,4 +100,13 @@ void AVictim::ReceiveUnsnare(ATrap* Trap)
 	Traps.Remove(Trap);
 	if (Traps.Num() == 0) Trapped = false;
 	Unsnare(Trap);
+}
+
+// Called when the victim needs to choose a new scare spot to run to
+AScareSpot* AVictim::GetRandomScareSpot()
+{
+	if (ScareSpots.Num() != 0)
+		return ScareSpots[FMath::RandRange(0, ScareSpots.Num() - 1)];
+
+	return nullptr;
 }

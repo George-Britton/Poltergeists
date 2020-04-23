@@ -6,10 +6,15 @@
 #include "GameFramework/Character.h"
 #include "Scares/ScareSpot.h"
 #include "Abilities/Trap.h"
+#include "Rooms/Door.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
 class ATrap;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRunAway);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRoundStart);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterNewRoom);
 
 UCLASS()
 class POLTERGEISTS_API AVictim : public ACharacter
@@ -22,6 +27,8 @@ public:
 	
 	// The current level of fear of the victim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
+		float StartingFear = 50.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		float Fear = 50.f;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
 		float FearDepletionSpeed = 5.f;
@@ -42,10 +49,40 @@ public:
 	// Marks the end of the round
 	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		bool RoundOver = false;
+	UPROPERTY(BlueprintReadOnly, Category = "Rounds")
+		int32 Round = 0;
+	
+	// The door that the victim runs to at the end of the round
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		ADoor* Door;
+
+	// The room to despawn on new round start
+	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
+		TSubclassOf<AActor> RoomClass;
+	UPROPERTY(BlueprintReadOnly, Category = "Room")
+		AActor* Room;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		FVector StartLocation;
+
+	// Event dispatcher for when the victim runs for the next room
+	UPROPERTY(BlueprintAssignable)
+		FOnRunAway OnRunAway;
+
+	// Event dispatcher for when the victim enters the new room
+	UPROPERTY(BlueprintAssignable)
+		FOnEnterNewRoom OnEnterNewRoom;
+	
+	// Event dispatcher for when the next round starts
+	UPROPERTY(BlueprintAssignable)
+		FOnRunAway OnRoundStart;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called when the game is ready for the next room to begin
+	UFUNCTION(BlueprintCallable, Category = "Events", DisplayName = "RoundStart")
+		void ReceiveRoundStart();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
 		void RoundStart();
 
@@ -56,6 +93,9 @@ protected:
 		void RunAway();
 
 	// Called when the victim enters a new room / level
+	UFUNCTION(BlueprintCallable, Category = "Room", DisplayName = "EnterNewRoom")
+	void ReceiveEnterNewRoom();
+	UFUNCTION(BlueprintImplementableEvent, Category = "Room")
 	void EnterNewRoom();
 
 public:
@@ -77,4 +117,8 @@ public:
 		void Snare(ATrap* Trap);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Trap")
 		void Unsnare(ATrap* Trap);
+
+	// Called when the victim needs to choose a new scare spot to run to
+	UFUNCTION(BlueprintCallable, Category = "Scare")
+		AScareSpot* GetRandomScareSpot();
 };

@@ -2,16 +2,28 @@
 
 #pragma once
 
+#include "Abilities/SpecialAbilityComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraActor.h"
-#include "Components/InputComponent.h"
 #include "Scares/ScareSpot.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "Abilities/Yeetable.h"
 #include "PlayerPoltergeist.generated.h"
 
 class APlayerPoltergeist;
+
+// Enum for the inter-room chasing
+UENUM(BlueprintType)
+enum class EChaseState : uint8
+{
+	FADING_IN UMETA(DisplayName="Fading In"),
+	FADING_OUT UMETA(DisplayName="Fading Out"),
+	MOVING UMETA(DisplayName="Moving"),
+	WAITING UMETA(DisplayName="Waiting"),
+	PLAYING UMETA(DisplayName="Playing"),
+	MAX
+};
 
 // Enum for the player ability types
 UENUM()
@@ -41,7 +53,11 @@ public:
 	// Camera for this player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		ACameraActor* PlayerCamera;
-
+	
+	// The victim
+	UPROPERTY(BlueprintReadOnly, Category = Victim)
+		AVictim* Victim;
+	
 	// Overlapped scare spot
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		AScareSpot* OverlappedScareSpot;
@@ -90,27 +106,24 @@ public:
 	// Special
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Special")
 		FOnSpecial OnSpecial;
+	UPROPERTY()
+		class USpecialAbilityComponent* SpecialComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		EPlayerAbility SpecialAbility = EPlayerAbility::MAX;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		float SpecialCooldown = 10.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
 		float SpecialCooldownTimer = 0.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition="SpecialAbility == EPlayerAbility::CURSE"))
-		float CurseMultiplier = 2.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Curse", meta = (EditCondition = "SpecialAbility == EPlayerAbility::CURSE"))
-		float CurseTime = 30.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Touche", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TOUCHE"))
-		float ToucheStrength = 80.f;
+	UPROPERTY()
 		AVictim* OverlappingVictim;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|TimeBomb", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TIMEBOMB"))
-		float TimeBombDelay = 3.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
-		float TrapStrength = 2.5f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
-		float TrapTime = 4.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special|Trap", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Abilities|Special", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
+	
+	// Used to chase the AI to the next room
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
+		EChaseState ChaseState = EChaseState::PLAYING;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
+		FVector RunToLocation = FVector::ZeroVector;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -142,9 +155,14 @@ public:
 	void Pickup();
 	void Yeet();
 	void Special();
-	void Touche();
 	void Trap();
 	void TimeBomb();
-	void Curse();
 	void DeclareSpecialDone();
+
+	// Called when the AI runs away
+	UFUNCTION()
+		void OnRunAway();
+	// Called when the AI starts the next round
+	UFUNCTION()
+		void OnRoundStart();
 };

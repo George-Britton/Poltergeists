@@ -90,10 +90,17 @@ public:
 
 	// The timers for the time bomb
 	TArray<float> TimeBombFuses;
+
+	// Whether the scare spot needs to be destroyed when the next round starts
+	bool MarkedForDeletion = false;
+
+	// Called when the game is ready for the next room to begin
+	virtual void BeginPlay() override;	
 	
 protected:
 	// Called whenever a value is changed
 	void OnConstruction(const FTransform& Transform) override;
+
 	
 public:	
 	// Called every frame
@@ -121,8 +128,17 @@ public:
 		void OnScareReset();
 		void OnScareReset_Implementation(){};
 
+	// Called when the actor is spawned or placed
+	UFUNCTION(BlueprintImplementableEvent, Category = "Events")
+		void SecondaryBeginPlay();
+	
 	// Called when the curse boi curses the scare spot
 		bool Curse(float Multiplier, float Time);
 	// Called when the time bomb sets and explodes
 		void TimeBomb(float Time);
+
+	// Called when the victim starts the round
+		void OnRoundStart();
+	// Called when the victim runs away
+		void OnRunAway();
 };

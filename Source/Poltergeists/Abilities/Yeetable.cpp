@@ -19,6 +19,7 @@ AYeetable::AYeetable()
 	MeshComponent->SetCollisionObjectType(ECC_PhysicsBody);
 	MeshComponent->SetCollisionProfileName("PhysicsBody");
 	MeshComponent->SetNotifyRigidBodyCollision(true);
+	MeshComponent->SetCanEverAffectNavigation(false);
 
 }
 
