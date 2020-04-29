@@ -41,31 +41,20 @@ void APlayerPoltergeist::BeginPlay()
 	default: break;
 	}
 	SpecialComponent->RegisterComponent();
-
-	// Sets the camera
-	//PlayerCamera = Cast<ACameraActor>(UGameplayStatics::GetActorOfClass(this, ACameraActor::StaticClass()));
 }
 
 // Called to intialise the controller and player assignment
-void APlayerPoltergeist::ReceiveInitialise()
+void APlayerPoltergeist::ReceiveInitialise(int32 ID)
 {
-	TEnumAsByte<EAutoReceiveInput::Type> PlayerInput = TEnumAsByte<EAutoReceiveInput::Type>(EAutoReceiveInput::Disabled);
-	switch (PlayerID)
-	{
-	case 0: PlayerInput = TEnumAsByte<EAutoReceiveInput::Type>(EAutoReceiveInput::Player0); break;
-	case 1: PlayerInput = TEnumAsByte<EAutoReceiveInput::Type>(EAutoReceiveInput::Player1); break;
-	case 2: PlayerInput = TEnumAsByte<EAutoReceiveInput::Type>(EAutoReceiveInput::Player2); break;
-	case 3: PlayerInput = TEnumAsByte<EAutoReceiveInput::Type>(EAutoReceiveInput::Player3); break;
-	default: break;
-	}
-	AutoReceiveInput = PlayerInput;
-	
 	// Sets the victim and binds the event listeners for the round timers
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
 	Victim->OnRoundStart.AddDynamic(this,  &APlayerPoltergeist::OnRoundStart);
+
+	// Creates the player controller
+	UGameplayStatics::CreatePlayer(this, ID, true);
 	
-	Initialise();
+	Initialise(ID);
 }
 
 // Called every frame

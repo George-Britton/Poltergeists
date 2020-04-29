@@ -49,10 +49,6 @@ class POLTERGEISTS_API APlayerPoltergeist : public ACharacter
 public:
 	// Sets default values for this character's properties
 	APlayerPoltergeist();
-
-	// The ID of the player used to set up controls and colour
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
-		int32 PlayerID = 0;
 	
 	// Camera for this player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -136,9 +132,9 @@ protected:
 public:
 	// Called to intialise the controller and player assignment
 	UFUNCTION(BlueprintCallable, Category = "Control", DisplayName = "Initialise")
-		void ReceiveInitialise();
+		void ReceiveInitialise(int32 ID);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Control")
-		void Initialise();
+		void Initialise(int32 ID);
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
