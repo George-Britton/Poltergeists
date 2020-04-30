@@ -41,12 +41,20 @@ void APlayerPoltergeist::BeginPlay()
 	default: break;
 	}
 	SpecialComponent->RegisterComponent();
-	
+}
+
+// Called to intialise the controller and player assignment
+void APlayerPoltergeist::ReceiveInitialise(int32 ID)
+{
 	// Sets the victim and binds the event listeners for the round timers
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
 	Victim->OnRoundStart.AddDynamic(this,  &APlayerPoltergeist::OnRoundStart);
 
+	// Creates the player controller
+	UGameplayStatics::CreatePlayer(this, ID, true);
+	
+	Initialise(ID);
 }
 
 // Called every frame

@@ -129,7 +129,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	// Called to intialise the controller and player assignment
+	UFUNCTION(BlueprintCallable, Category = "Control", DisplayName = "Initialise")
+		void ReceiveInitialise(int32 ID);
+	UFUNCTION(BlueprintImplementableEvent, Category = "Control")
+		void Initialise(int32 ID);
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -155,8 +161,6 @@ public:
 	void Pickup();
 	void Yeet();
 	void Special();
-	void Trap();
-	void TimeBomb();
 	void DeclareSpecialDone();
 
 	// Called when the AI runs away
