@@ -30,22 +30,24 @@ void APlayerPoltergeist::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Sets the special ability component
-	const FTransform SpecialTransform;
-	switch(SpecialAbility)
-	{
-	case EPlayerAbility::TOUCHE: SpecialComponent = Cast<UToucheAbilityComponent>(StaticConstructObject_Internal(UToucheAbilityComponent::StaticClass(), this)); break;
-	case EPlayerAbility::CURSE: SpecialComponent = Cast<UCurseAbilityComponent>(StaticConstructObject_Internal(UCurseAbilityComponent::StaticClass(), this)); break;
-	case EPlayerAbility::TIMEBOMB: SpecialComponent = Cast<UTimeBombAbilityComponent>(StaticConstructObject_Internal(UTimeBombAbilityComponent::StaticClass(), this)); break;
-	case EPlayerAbility::TRAP: SpecialComponent = Cast<UTrapAbilityComponent>(StaticConstructObject_Internal(UTrapAbilityComponent::StaticClass(), this)); break;
-	default: break;
-	}
-	SpecialComponent->RegisterComponent();
 }
 
 // Called to intialise the controller and player assignment
-void APlayerPoltergeist::ReceiveInitialise(int32 ID)
+void APlayerPoltergeist::ReceiveInitialise(int32 ID, int32 SpecialID)
 {
+	// Sets the special ability component
+	const FTransform SpecialTransform;
+	switch(SpecialID)
+	{
+	case 0: SpecialComponent = Cast<UToucheAbilityComponent>(StaticConstructObject_Internal(UToucheAbilityComponent::StaticClass(), this)); break;
+	case 1: SpecialComponent = Cast<UCurseAbilityComponent>(StaticConstructObject_Internal(UCurseAbilityComponent::StaticClass(), this)); break;
+	case 2: SpecialComponent = Cast<UTimeBombAbilityComponent>(StaticConstructObject_Internal(UTimeBombAbilityComponent::StaticClass(), this)); break;
+	case 3: SpecialComponent = Cast<UTrapAbilityComponent>(StaticConstructObject_Internal(UTrapAbilityComponent::StaticClass(), this)); break;
+	default: break;
+	}
+	SpecialComponent->RegisterComponent();
+
+	
 	// Sets the victim and binds the event listeners for the round timers
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 	Victim->OnRunAway.AddDynamic(this, &APlayerPoltergeist::OnRunAway);
@@ -54,7 +56,7 @@ void APlayerPoltergeist::ReceiveInitialise(int32 ID)
 	// Creates the player controller
 	UGameplayStatics::CreatePlayer(this, ID, true);
 	
-	Initialise(ID);
+	Initialise(ID, SpecialID);
 }
 
 // Called every frame

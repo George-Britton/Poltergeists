@@ -106,10 +106,10 @@ public:
 	// Special
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Special")
 		FOnSpecial OnSpecial;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		class USpecialAbilityComponent* SpecialComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
-		EPlayerAbility SpecialAbility = EPlayerAbility::MAX;
+		EPlayerAbility SpecialAbility = EPlayerAbility::TOUCHE;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
 		float SpecialCooldown = 10.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
@@ -132,9 +132,9 @@ protected:
 public:
 	// Called to intialise the controller and player assignment
 	UFUNCTION(BlueprintCallable, Category = "Control", DisplayName = "Initialise")
-		void ReceiveInitialise(int32 ID);
+		void ReceiveInitialise(int32 ID, int32 SpecialID);
 	UFUNCTION(BlueprintImplementableEvent, Category = "Control")
-		void Initialise(int32 ID);
+		void Initialise(int32 ID, int32 SpecialID);
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
