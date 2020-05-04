@@ -23,7 +23,13 @@ void AScareSpotRandomiser::BeginPlay()
 		FActorSpawnParameters SpawnParams;
 		FVector SpawnLoc = GetActorLocation();
 		FRotator SpawnRot = GetActorRotation();
-		AScareSpot* SpawnedScareSpot = GetWorld()->SpawnActor<AScareSpot>(ScareSpots[SpawnNum], SpawnLoc, SpawnRot, SpawnParams);
+		SpawnedScareSpot = GetWorld()->SpawnActor<AScareSpot>(ScareSpots[SpawnNum], SpawnLoc, SpawnRot, SpawnParams);
 	}
+}
+
+// Called when the room is destroyed
+void AScareSpotRandomiser::OnDeletion()
+{
+	SpawnedScareSpot->Destroy();
 	Destroy();
 }

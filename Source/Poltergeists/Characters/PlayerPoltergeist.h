@@ -53,6 +53,10 @@ public:
 	// Camera for this player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		ACameraActor* PlayerCamera;
+
+	// ID of the player, used for specific actor and location assigning
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		int32 PlayerID = 0;
 	
 	// The victim
 	UPROPERTY(BlueprintReadOnly, Category = Victim)

@@ -19,7 +19,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
 		TArray<TSubclassOf<AScareSpot>> ScareSpots;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Scare")
+		AScareSpot* SpawnedScareSpot;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Called when the room is destroyed
+	UFUNCTION(BlueprintCallable, Category = "Events")
+		void OnDeletion();
 };

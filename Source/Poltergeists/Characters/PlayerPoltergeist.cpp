@@ -35,6 +35,8 @@ void APlayerPoltergeist::BeginPlay()
 // Called to intialise the controller and player assignment
 void APlayerPoltergeist::ReceiveInitialise(int32 ID, int32 SpecialID)
 {
+	PlayerID = ID;
+	
 	// Sets the special ability component
 	const FTransform SpecialTransform;
 	switch(SpecialID)
