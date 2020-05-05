@@ -5,13 +5,11 @@
 #include "Abilities/SpecialAbilityComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Camera/CameraActor.h"
 #include "Scares/ScareSpot.h"
+#include "Camera/CameraActor.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
-#include "Abilities/Yeetable.h"
 #include "PlayerPoltergeist.generated.h"
 
-class APlayerPoltergeist;
 
 // Enum for the inter-room chasing
 UENUM(BlueprintType)
@@ -60,11 +58,11 @@ public:
 	
 	// The victim
 	UPROPERTY(BlueprintReadOnly, Category = Victim)
-		AVictim* Victim;
+		class AVictim* Victim;
 	
 	// Overlapped scare spot
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
-		AScareSpot* OverlappedScareSpot;
+		class AScareSpot* OverlappedScareSpot;
 
 	// Time it takes for the player's scare ability to cooldown
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
@@ -104,7 +102,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		UPrimitiveComponent* ComponentHeld;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
-		AYeetable* ObjectBeingHeld;
+		class AYeetable* ObjectBeingHeld;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float ItemHeldDistance = 50.f;
 	// Special
@@ -119,7 +117,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Special")
 		float SpecialCooldownTimer = 0.f;
 	UPROPERTY()
-		AVictim* OverlappingVictim;
+		class AVictim* OverlappingVictim;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Abilities|Special", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
 	

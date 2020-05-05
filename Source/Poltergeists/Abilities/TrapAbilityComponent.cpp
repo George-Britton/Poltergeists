@@ -2,6 +2,7 @@
 
 
 #include "TrapAbilityComponent.h"
+#include "Characters/PlayerPoltergeist.h"
 
 // Called when the player presses the special ability button
 void UTrapAbilityComponent::Execute()

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "Characters/PlayerPoltergeist.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "SpecialAbilityComponent.generated.h"

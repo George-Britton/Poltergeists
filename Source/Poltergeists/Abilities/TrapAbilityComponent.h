@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/SpecialAbilityComponent.h"
+#include "Abilities/Trap.h"
 #include "TrapAbilityComponent.generated.h"
 
 /**

@@ -2,6 +2,7 @@
 
 
 #include "TimeBombAbilityComponent.h"
+#include "Characters/PlayerPoltergeist.h"
 
 // Called when the player presses the special ability button
 void UTimeBombAbilityComponent::Execute()

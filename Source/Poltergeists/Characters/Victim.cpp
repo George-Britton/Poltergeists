@@ -3,6 +3,8 @@
 #include "Victim.h"
 #include "Engine/Engine.h"
 #include "Kismet/GameplayStatics.h"
+#include "Abilities/Trap.h"
+#include "Scares/ScareSpot.h"
 #include "Polterguys.h"
 
 // Sets default values

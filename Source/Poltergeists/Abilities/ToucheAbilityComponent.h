@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/SpecialAbilityComponent.h"
+#include "Scares/ScareSpot.h"
 #include "ToucheAbilityComponent.generated.h"
 
 /**

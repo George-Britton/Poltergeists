@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Scares/ScareSpot.h"
-#include "Abilities/Trap.h"
 #include "Rooms/Door.h"
 #include "Victim.generated.h"
 

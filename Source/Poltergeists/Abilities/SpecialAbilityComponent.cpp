@@ -2,6 +2,7 @@
 
 
 #include "SpecialAbilityComponent.h"
+#include "Characters/PlayerPoltergeist.h"
 
 // Sets default values for this component's properties
 USpecialAbilityComponent::USpecialAbilityComponent()
