@@ -136,9 +136,4 @@ public:
 		bool Curse(float Multiplier, float Time);
 	// Called when the time bomb sets and explodes
 		void TimeBomb(float Time);
-
-	// Called when the victim starts the round
-		void OnRoundStart();
-	// Called when the victim runs away
-		void OnRunAway();
 };

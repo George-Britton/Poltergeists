@@ -36,8 +36,6 @@ void AScareSpot::OnConstruction(const FTransform& Transform)
 void AScareSpot::BeginPlay()
 {
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
-	Victim->OnRoundStart.AddDynamic(this, &AScareSpot::OnRoundStart);
-	Victim->OnRunAway.AddDynamic(this, &AScareSpot::OnRunAway);
 
 	SecondaryBeginPlay();
 }
@@ -141,20 +139,4 @@ bool AScareSpot::Curse(float Multiplier, float Time)
 void AScareSpot::TimeBomb(float Time)
 {
 	TimeBombFuses.Add(Time);
-}
-
-// Called when the victim starts the round
-void AScareSpot::OnRoundStart()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ScareSpot OnRoundStart");
-	if (MarkedForDeletion) Destroy();
-	else Victim->ScareSpots.Add(this);
-}
-
-// Called when the victim runs away
-void AScareSpot::OnRunAway()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "ScareSpot OnRunAway");
-	Victim->ScareSpots.Remove(this);
-	MarkedForDeletion = true;
 }
