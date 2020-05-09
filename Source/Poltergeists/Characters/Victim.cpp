@@ -28,6 +28,8 @@ void AVictim::BeginPlay()
 // Called when the fear meter is full
 void AVictim::ReceiveRunAway()
 {
+	ScareSpots.Empty();
+	
 	OnRunAway.Broadcast();
 	RunAway();
 }
@@ -42,6 +44,11 @@ void AVictim::ReceiveEnterNewRoom()
 	// Registers the new room and increments the round
 	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
 	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
+
+	// Finds the new scare spots
+	TArray<AActor*> TempScareSpots;
+	UGameplayStatics::GetAllActorsOfClass(this, AScareSpot::StaticClass(), TempScareSpots);
+	for (auto& ScareSpot : TempScareSpots) { ScareSpots.Add(Cast<AScareSpot>(ScareSpot)); }
 	
 	EnterNewRoom();
 	ReceiveRoundStart();
@@ -55,7 +62,7 @@ void AVictim::Tick(float DeltaTime)
 	if (Fear < 100.f && Fear > 0.f && !RoundOver)
 	{
 		Fear -= FearDepletionSpeed * DeltaTime;
-		FMath::Clamp<float>(Fear, 0, 100);
+		FMath::Clamp<float>(Fear, 0, 150);
 	}
 	else if (!RoundOver && Fear >= 100)
 	{

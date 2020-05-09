@@ -36,7 +36,7 @@ public:
 		float MaxScareDistance = 300.f;
 
 	// Array of all the scare spots - places they might run to
-	UPROPERTY(BlueprintReadOnly, Category = "Scares")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
 
 	// Whether the victim is caught in a trap
