@@ -19,7 +19,7 @@ public:
 	
 	// The scare strength of the touche
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
-		float ToucheStrength = 80.f;
+		float ToucheStrength = 50.f;
 
 	// Called when the player presses the special ability button
 	void Execute() override;

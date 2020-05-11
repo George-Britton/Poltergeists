@@ -59,10 +59,10 @@ void AVictim::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Fear < 100.f && Fear > 0.f && !RoundOver)
+	if (Fear < 100.f && Fear >= 0.f && !RoundOver)
 	{
 		Fear -= FearDepletionSpeed * DeltaTime;
-		FMath::Clamp<float>(Fear, 0, 150);
+		if (Fear < 0) Fear = 0;
 	}
 	else if (!RoundOver && Fear >= 100)
 	{
