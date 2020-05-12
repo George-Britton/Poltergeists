@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Scares/ScareSpot.h"
-#include "Abilities/Trap.h"
 #include "Rooms/Door.h"
 #include "Victim.generated.h"
 
@@ -38,7 +36,7 @@ public:
 		float MaxScareDistance = 300.f;
 
 	// Array of all the scare spots - places they might run to
-	UPROPERTY(BlueprintReadOnly, Category = "Scares")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
 
 	// Whether the victim is caught in a trap

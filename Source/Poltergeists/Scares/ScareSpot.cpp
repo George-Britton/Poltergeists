@@ -35,6 +35,8 @@ void AScareSpot::OnConstruction(const FTransform& Transform)
 // Called when the game is ready for the next room to begin
 void AScareSpot::BeginPlay()
 {
+	Super::BeginPlay();
+
 	Victim = Cast<AVictim>(UGameplayStatics::GetActorOfClass(this, AVictim::StaticClass()));
 
 	SecondaryBeginPlay();
