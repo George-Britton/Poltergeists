@@ -12,6 +12,8 @@ AVictim::AVictim()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	ScreamSpeaker = CreateDefaultSubobject<UAudioComponent>(TEXT("Scream Speaker"));
+	ScreamSpeaker->SetupAttachment(RootComponent);
 	
 	// Initialise the scare spots array
 	ScareSpots.Init(nullptr, 1);
@@ -93,6 +95,24 @@ void AVictim::ReceiveScare(FVector ScareSource, float ScareStrength)
 		FearToAdd = 1 - FearToAdd;
 		FearToAdd *= ScareStrength;
 		Fear += FearToAdd;
+
+		if (Fear <= 33.f && MildScreams.Num() > 0)
+		{
+			ScreamSpeaker->SetSound(MildScreams[FMath::RandRange(0, MildScreams.Num() - 1)]);
+			ScreamSpeaker->Play();
+		}
+		else if (Fear <= 66.f && MediumScreams.Num() > 0)
+		{
+			ScreamSpeaker->SetSound(MediumScreams[FMath::RandRange(0, MediumScreams.Num() - 1)]);
+			ScreamSpeaker->Play();
+		}
+		else if (IntenseScreams.Num() > 0)
+		{
+			ScreamSpeaker->SetSound(IntenseScreams[FMath::RandRange(0, IntenseScreams.Num() - 1)]);
+			ScreamSpeaker->Play();
+		}
+		else { GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "WARNING: NO SCREAMS SET ON " + this->GetName()); }
+		
 		Scare(ScareSource, ScareStrength);
 	}
 }
