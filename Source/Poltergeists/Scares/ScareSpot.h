@@ -47,6 +47,12 @@ public:
 	UPROPERTY()
 		UStaticMeshComponent* ScareSpotMeshComponent;
 	
+	// The audio that plays when the scare is activated
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
+		USoundBase* ScareSound;
+	UPROPERTY()
+		UAudioComponent* SoundComponent;
+	
 	// Distance the player must be within to activate the scare spot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Activation")
 		float ActivationDistance = 100;

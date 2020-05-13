@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Rooms/Door.h"
+#include "Components/AudioComponent.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
@@ -31,6 +32,26 @@ public:
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
 		float FearDepletionSpeed = 5.f;
 
+	// Sounds that are played when the victim is scared
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* MildScreams;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* MediumScreams;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* IntenseScreams;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* RunAwayScream;
+	UPROPERTY()
+		UAudioComponent* ScreamSpeaker;
+
+	// Sounds that are played when the victim is at different levels of fear
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* MildFearSound;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* IntenseFearSound;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		float FearScreamProbabilityPercent = 0.5f;
+	
 	// How far away the scare spot can be without causing no fear
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
 		float MaxScareDistance = 300.f;

@@ -8,7 +8,6 @@
 #include "TimerManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/TrapAbilityComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Abilities/Yeetable.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -20,6 +19,9 @@ APlayerPoltergeist::APlayerPoltergeist()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Physics Handle"));
+	AbilitySpeaker= CreateDefaultSubobject<UAudioComponent>(TEXT("Ability Speaker"));
+	AbilitySpeaker->SetupAttachment(RootComponent);
+	AbilitySpeaker->bAutoActivate = false;
 	
 	// Allow the player to rotate towards their movement vector
 	GetCharacterMovement()->bOrientRotationToMovement = 1;
@@ -137,6 +139,9 @@ void APlayerPoltergeist::ReceiveActivateScare()
 		if (OverlappedScareSpot->ReceiveActivateScareSpot())
 		{
 			CooldownTimer = Cooldown;
+			AbilitySpeaker->Stop();
+			AbilitySpeaker->SetSound(ScareSound);
+			AbilitySpeaker->Play();
 			ActivateScare();
 		}
 	}
@@ -150,6 +155,9 @@ void APlayerPoltergeist::Dash()
 	{
 		ACharacter::LaunchCharacter(GetActorForwardVector() * DashSpeed, true, false);
 		DashCooldownTimer = DashCooldown;
+		AbilitySpeaker->Stop();
+		AbilitySpeaker->SetSound(DashSound);
+		AbilitySpeaker->Play();
 		OnDash.Broadcast();
 	}
 }
@@ -190,6 +198,9 @@ void APlayerPoltergeist::Yeet()
 		ComponentHeld = nullptr;
 		ObjectBeingHeld = nullptr;
 		YeetCooldownTimer = YeetCooldown;
+		AbilitySpeaker->Stop();
+		AbilitySpeaker->SetSound(YeetSound);
+		AbilitySpeaker->Play();
 	}
 }
 void APlayerPoltergeist::Special()

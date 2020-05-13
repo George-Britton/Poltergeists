@@ -20,10 +20,14 @@ void APolterguys::OnVictimRunAway()
 {
 	if (RoomClassArray.Num())
 	{
-		int32 SpawnNum = UKismetMathLibrary::RandomIntegerInRange(0, RoomClassArray.Num() - 1);
+		int32 NewRoomNumber;
+		do{
+			NewRoomNumber = UKismetMathLibrary::RandomIntegerInRange(0, RoomClassArray.Num() - 1);
+		} while (NewRoomNumber == LastRoomNumber);
+		LastRoomNumber = NewRoomNumber;
 		FActorSpawnParameters SpawnParams;
 		FVector SpawnLoc = Victim->Door->GetActorLocation();
 		FRotator SpawnRot = FRotator::ZeroRotator;
-		AActor* NewRoom = GetWorld()->SpawnActor<AActor>(RoomClassArray[SpawnNum], SpawnLoc, SpawnRot, SpawnParams);
+		AActor* NewRoom = GetWorld()->SpawnActor<AActor>(RoomClassArray[NewRoomNumber], SpawnLoc, SpawnRot, SpawnParams);
 	}
 }

@@ -10,6 +10,8 @@ void UTimeBombAbilityComponent::Execute()
 	if (Player->OverlappedScareSpot)
 	{
 		Player->OverlappedScareSpot->TimeBomb(TimeBombDelay);
+		if (!ActivationSpeaker->Sound) ActivationSpeaker->SetSound(Player->TimeBombSound);
+		ActivationSpeaker->Play();
 		Player->DeclareSpecialDone();
 	}
 }

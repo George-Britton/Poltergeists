@@ -70,6 +70,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Scares")
 		float CooldownTimer = 0.f;
 
+	// The sounds played when the player uses an ability
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds")
+		USoundBase* ScareSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds")
+		USoundBase* YeetSound;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sounds")
+		USoundBase* DashSound;
+	UPROPERTY()
+		UAudioComponent* AbilitySpeaker;
+	
 	// Event Dispatchers and abilities variables
 	// Dash
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Dash")
@@ -120,6 +130,16 @@ public:
 		class AVictim* OverlappingVictim;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, category = "Abilities|Special", meta = (EditCondition = "SpecialAbility == EPlayerAbility::TRAP"))
 		UStaticMesh* TrapMesh;
+	// The special ability sounds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		USoundBase* ToucheSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		USoundBase* CurseSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		USoundBase* TimeBombSound;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Special")
+		USoundBase* TrapSound;
+	
 	
 	// Used to chase the AI to the next room
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rounds")
