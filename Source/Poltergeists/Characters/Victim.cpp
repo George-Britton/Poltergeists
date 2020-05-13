@@ -5,7 +5,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Abilities/Trap.h"
 #include "Scares/ScareSpot.h"
-#include "Polterguys.h"
 
 // Sets default values
 AVictim::AVictim()
@@ -14,6 +13,7 @@ AVictim::AVictim()
 	PrimaryActorTick.bCanEverTick = true;
 	ScreamSpeaker = CreateDefaultSubobject<UAudioComponent>(TEXT("Scream Speaker"));
 	ScreamSpeaker->SetupAttachment(RootComponent);
+	ScreamSpeaker->bAutoActivate = false;
 	
 	// Initialise the scare spots array
 	ScareSpots.Init(nullptr, 1);
@@ -31,6 +31,10 @@ void AVictim::BeginPlay()
 void AVictim::ReceiveRunAway()
 {
 	ScareSpots.Empty();
+
+	ScreamSpeaker->Stop();
+	ScreamSpeaker->SetSound(RunAwayScream);
+	ScreamSpeaker->Play();
 	
 	OnRunAway.Broadcast();
 	RunAway();
@@ -65,6 +69,18 @@ void AVictim::Tick(float DeltaTime)
 	{
 		Fear -= FearDepletionSpeed * DeltaTime;
 		if (Fear < 0) Fear = 0;
+		if (FMath::FRandRange(0.f, 100.f) < FearScreamProbabilityPercent && !ScreamSpeaker->IsPlaying())
+		{
+			if (Fear >= 33.3f && Fear <= 66.6f && MildFearSound)
+			{
+				ScreamSpeaker->SetSound(MildFearSound);
+				ScreamSpeaker->Play();
+			} else if (IntenseFearSound)
+			{
+				ScreamSpeaker->SetSound(IntenseFearSound);
+				ScreamSpeaker->Play();
+			}
+		}
 	}
 	else if (!RoundOver && Fear >= 100)
 	{
@@ -96,23 +112,23 @@ void AVictim::ReceiveScare(FVector ScareSource, float ScareStrength)
 		FearToAdd *= ScareStrength;
 		Fear += FearToAdd;
 
-		if (Fear <= 33.f && MildScreams.Num() > 0)
+		// Plays a random scream applicable for the fear
+		if (!ScreamSpeaker->IsPlaying())
 		{
-			ScreamSpeaker->SetSound(MildScreams[FMath::RandRange(0, MildScreams.Num() - 1)]);
-			ScreamSpeaker->Play();
+			if (Fear <= 33.3f && MildScreams)
+			{
+				ScreamSpeaker->SetSound(MildScreams);
+				ScreamSpeaker->Play();
+			} else if (Fear <= 66.6f && MediumScreams)
+			{
+				ScreamSpeaker->SetSound(MediumScreams);
+				ScreamSpeaker->Play();
+			} else if (IntenseScreams)
+			{
+				ScreamSpeaker->SetSound(IntenseScreams);
+				ScreamSpeaker->Play();
+			} else { GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "WARNING: NO SCREAMS SET ON " + this->GetName()); }
 		}
-		else if (Fear <= 66.f && MediumScreams.Num() > 0)
-		{
-			ScreamSpeaker->SetSound(MediumScreams[FMath::RandRange(0, MediumScreams.Num() - 1)]);
-			ScreamSpeaker->Play();
-		}
-		else if (IntenseScreams.Num() > 0)
-		{
-			ScreamSpeaker->SetSound(IntenseScreams[FMath::RandRange(0, IntenseScreams.Num() - 1)]);
-			ScreamSpeaker->Play();
-		}
-		else { GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "WARNING: NO SCREAMS SET ON " + this->GetName()); }
-		
 		Scare(ScareSource, ScareStrength);
 	}
 }

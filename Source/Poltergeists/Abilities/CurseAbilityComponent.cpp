@@ -9,6 +9,11 @@ void UCurseAbilityComponent::Execute()
 {
 	if (Player->OverlappedScareSpot)
 	{
-		if (Player->OverlappedScareSpot->Curse(CurseMultiplier, CurseTime)) { Player->DeclareSpecialDone(); }
+		if (Player->OverlappedScareSpot->Curse(CurseMultiplier, CurseTime))
+		{
+			Player->DeclareSpecialDone();
+			if (!ActivationSpeaker->Sound) ActivationSpeaker->SetSound(Player->CurseSound);
+			ActivationSpeaker->Play();
+		}
 	}
 }

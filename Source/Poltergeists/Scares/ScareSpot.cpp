@@ -13,10 +13,13 @@ AScareSpot::AScareSpot()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	ScareSpotMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	ActivationSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Activation Sphere"));
-
+	SoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("Scare Sound"));
+	SoundComponent->bAutoActivate = false;
+	
 	// Connect all the components to the root
 	ScareSpotMeshComponent->SetupAttachment(RootComponent);
 	ActivationSphere->SetupAttachment(RootComponent);
+	SoundComponent->SetupAttachment(RootComponent);
 	RootComponent->SetMobility(EComponentMobility::Movable);
 	ScareSpotMeshComponent->SetMobility(EComponentMobility::Movable);
 }
@@ -27,6 +30,8 @@ void AScareSpot::OnConstruction(const FTransform& Transform)
 	if (ScareSpotMesh) ScareSpotMeshComponent->SetStaticMesh(ScareSpotMesh);
 		ActivationSphere->SetSphereRadius(ActivationDistance);
 
+	if (ScareSound) SoundComponent->SetSound(ScareSound);
+	
 	ActivationSphere->SetRelativeLocation(ActivationSphereRelativeLocation);
 	
 	RechargeTimer = RechargeTime;
@@ -89,6 +94,8 @@ bool AScareSpot::ReceiveActivateScareSpot()
 		ActiveTimer = ActiveTime;
 		ActivateScareSpot();
 		Victim->ReceiveScare(GetActorLocation(), ScareStrength * (RechargeTimer / RechargeTime));
+
+		if (ScareSound) SoundComponent->Play();
 		
 		return true;
 	}
@@ -98,6 +105,7 @@ bool AScareSpot::ReceiveActivateScareSpot()
 // Called when the scare spot finishes scaring and starts the cooldown period
 void AScareSpot::BeginRecharge()
 {
+	SoundComponent->Stop();
 	OnScareFinish();
 	
 	if (Retriggerable)

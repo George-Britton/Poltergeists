@@ -34,13 +34,23 @@ public:
 
 	// Sounds that are played when the victim is scared
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
-		TArray<USoundBase*> MildScreams;
+		USoundBase* MildScreams;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
-		TArray<USoundBase*> MediumScreams;
+		USoundBase* MediumScreams;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
-		TArray<USoundBase*> IntenseScreams;
+		USoundBase* IntenseScreams;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* RunAwayScream;
 	UPROPERTY()
 		UAudioComponent* ScreamSpeaker;
+
+	// Sounds that are played when the victim is at different levels of fear
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* MildFearSound;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		USoundBase* IntenseFearSound;
+	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
+		float FearScreamProbabilityPercent = 0.5f;
 	
 	// How far away the scare spot can be without causing no fear
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")

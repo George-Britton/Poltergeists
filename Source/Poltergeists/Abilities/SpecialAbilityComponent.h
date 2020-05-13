@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
 #include "SpecialAbilityComponent.generated.h"
 
 
@@ -19,7 +21,11 @@ public:
 	// The player the component is attached to
 	UPROPERTY()
 		class APlayerPoltergeist* Player;
-	
+
+	// The speaker played during activation
+	UPROPERTY()
+		UAudioComponent* ActivationSpeaker;
+
 	// Called when the player presses the special ability button
 	virtual void Execute();
 };

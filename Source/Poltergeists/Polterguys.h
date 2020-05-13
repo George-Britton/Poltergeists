@@ -23,7 +23,11 @@ public:
 
 	// The victim in the level
 	UPROPERTY(BlueprintReadOnly, Category =  "Victim")
-	AVictim* Victim;
+		AVictim* Victim;
+
+	// The last room that was played
+	UPROPERTY()
+		int32 LastRoomNumber = 0;
 	
 	// Called when the victim runs away at full fear
 	UFUNCTION()

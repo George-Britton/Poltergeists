@@ -17,5 +17,7 @@ void UTrapAbilityComponent::Execute()
 	Trap->SetMesh(Player->TrapMesh);
 	Trap->StartCountdown(TrapTime);
 	Trap->TrapStrength = TrapStrength;
+	if (!ActivationSpeaker->Sound) ActivationSpeaker->SetSound(Player->TrapSound);
+	ActivationSpeaker->Play();
 	Player->DeclareSpecialDone();
 }
