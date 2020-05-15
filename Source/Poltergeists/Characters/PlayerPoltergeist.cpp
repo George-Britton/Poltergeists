@@ -19,13 +19,22 @@ APlayerPoltergeist::APlayerPoltergeist()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("Physics Handle"));
-	AbilitySpeaker= CreateDefaultSubobject<UAudioComponent>(TEXT("Ability Speaker"));
+	AbilitySpeaker = CreateDefaultSubobject<UAudioComponent>(TEXT("Ability Speaker"));
+	DashParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Dash Particles"));
 	AbilitySpeaker->SetupAttachment(RootComponent);
+	DashParticleSystem->SetupAttachment(RootComponent);
 	AbilitySpeaker->bAutoActivate = false;
+	DashParticleSystem->bAutoActivate = false;
 	
 	// Allow the player to rotate towards their movement vector
 	GetCharacterMovement()->bOrientRotationToMovement = 1;
 	bUseControllerRotationYaw = false;
+}
+
+// Called when a value is changed
+void APlayerPoltergeist::OnConstruction(const FTransform& Transform)
+{
+	if (DashParticleTemplate) DashParticleSystem->SetTemplate(DashParticleTemplate);
 }
 
 // Called when the game starts or when spawned
@@ -155,9 +164,22 @@ void APlayerPoltergeist::Dash()
 	{
 		ACharacter::LaunchCharacter(GetActorForwardVector() * DashSpeed, true, false);
 		DashCooldownTimer = DashCooldown;
-		AbilitySpeaker->Stop();
-		AbilitySpeaker->SetSound(DashSound);
-		AbilitySpeaker->Play();
+		if (DashSound)
+		{
+			AbilitySpeaker->Stop();
+			AbilitySpeaker->SetSound(DashSound);
+			AbilitySpeaker->Play();
+		}
+
+		if (DashParticleTemplate)
+		{
+			DashParticleSystem->Activate();
+			FTimerHandle DashTimer;
+			FTimerDelegate DashDelegate;
+			DashDelegate.BindUFunction(this, "OnDashFinish");
+			GetWorld()->GetTimerManager().SetTimer(DashTimer, DashDelegate, DashTimeInSeconds, false);
+		}
+		
 		OnDash.Broadcast();
 	}
 }
@@ -198,9 +220,12 @@ void APlayerPoltergeist::Yeet()
 		ComponentHeld = nullptr;
 		ObjectBeingHeld = nullptr;
 		YeetCooldownTimer = YeetCooldown;
-		AbilitySpeaker->Stop();
-		AbilitySpeaker->SetSound(YeetSound);
-		AbilitySpeaker->Play();
+		if (YeetSound)
+		{
+			AbilitySpeaker->Stop();
+			AbilitySpeaker->SetSound(YeetSound);
+			AbilitySpeaker->Play();
+		}
 	}
 }
 void APlayerPoltergeist::Special()
