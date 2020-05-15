@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Scares/ScareSpot.h"
 #include "Camera/CameraActor.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "PlayerPoltergeist.generated.h"
 
@@ -92,6 +93,10 @@ public:
 		float DashCooldown = 5.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Dash")
 		float DashCooldownTimer = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
+		UParticleSystem* DashParticleTemplate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Dash")
+		UParticleSystemComponent* DashParticleSystem;
 	// Yeet
 	UPROPERTY(BlueprintAssignable, Category = "Abilities|Yeet")
 		FOnYeet OnYeet;
@@ -151,6 +156,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Called when a value is changed
+	void OnConstruction(const FTransform& Transform) override;
+
 public:
 	// Called to intialise the controller and player assignment
 	UFUNCTION(BlueprintCallable, Category = "Control", DisplayName = "Initialise")
@@ -184,6 +192,13 @@ public:
 	void Yeet();
 	void Special();
 	void DeclareSpecialDone();
+
+	// Deactivating the dash particle system
+	UFUNCTION()
+	void OnDashFinish()
+	{
+		DashParticleSystem->Deactivate();
+	}
 
 	// Called when the AI runs away
 	UFUNCTION()
