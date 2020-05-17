@@ -44,7 +44,7 @@ public:
 	// The main mesh of the scare spot#
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Apperance")
 		UStaticMesh* ScareSpotMesh;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Apperance")
 		UStaticMeshComponent* ScareSpotMeshComponent;
 	
 	// The audio that plays when the scare is activated

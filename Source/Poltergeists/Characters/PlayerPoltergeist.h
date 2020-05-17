@@ -107,7 +107,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
 		float YeetIncline = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities|Yeet")
-		float YeetCooldown = 5.f;
+		float YeetCooldown = 2.5f;
 	UPROPERTY(BlueprintReadOnly, Category = "Abilities|Yeet")
 		float YeetCooldownTimer = 0.f;
 	UPROPERTY(BlueprintReadWrite, Category = "Abilities|Yeet")
