@@ -30,7 +30,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Fear")
 		float Fear = 50.f;
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
-		float FearDepletionSpeed = 5.f;
+		float FearDepletionSpeed = 2.5f;
 
 	// Sounds that are played when the victim is scared
 	UPROPERTY(Editanywhere, BlueprintReadWrite, Category = "Fear")
@@ -54,7 +54,7 @@ public:
 	
 	// How far away the scare spot can be without causing no fear
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fear")
-		float MaxScareDistance = 300.f;
+		float MaxScareDistance = 600.f;
 
 	// Array of all the scare spots - places they might run to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
