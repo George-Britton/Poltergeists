@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Rooms/Door.h"
 #include "Components/AudioComponent.h"
+#include "Rooms/Room.h"
 #include "Victim.generated.h"
 
 class AScareSpot;
@@ -76,12 +77,14 @@ public:
 		ADoor* Door;
 
 	// The room to despawn on new round start
-	UPROPERTY(editAnywhere, BlueprintReadWrite, Category = "Room")
-		TSubclassOf<AActor> RoomClass;
 	UPROPERTY(BlueprintReadOnly, Category = "Room")
-		AActor* Room;
+		ARoom* Room;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		FVector StartLocation;
+		
+	// Check for if the player is already running away
+	UPROPERTY(BlueprintReadOnly, Category = "Rounds")
+		bool IsRunningAway = true;
 
 	// Event dispatcher for when the victim runs for the next room
 	UPROPERTY(BlueprintAssignable)

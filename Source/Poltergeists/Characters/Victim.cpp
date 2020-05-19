@@ -30,12 +30,14 @@ void AVictim::BeginPlay()
 // Called when the fear meter is full
 void AVictim::ReceiveRunAway()
 {
+	IsRunningAway = true;
 	ScareSpots.Empty();
+	if (Room) Room->MarkForDeletion();
 
 	ScreamSpeaker->Stop();
 	ScreamSpeaker->SetSound(RunAwayScream);
 	ScreamSpeaker->Play();
-	
+		
 	OnRunAway.Broadcast();
 	RunAway();
 }
@@ -45,10 +47,11 @@ void AVictim::ReceiveEnterNewRoom()
 {
 	// Destroys the room and resets the fear
 	Fear = StartingFear;
+	if (Room) Room->Delete();
 	OnEnterNewRoom.Broadcast();
-	
+		
 	// Registers the new room and increments the round
-	Room = UGameplayStatics::GetActorOfClass(this, RoomClass);
+	Room = Cast<ARoom>(UGameplayStatics::GetActorOfClass(this, ARoom::StaticClass()));
 	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
 
 	// Finds the new scare spots
@@ -92,10 +95,13 @@ void AVictim::Tick(float DeltaTime)
 // Called when the game is ready for the next room to begin
 void AVictim::ReceiveRoundStart()
 {
+
+	IsRunningAway = false;
 	++Round;
 	RoundOver = false;
 	OnRoundStart.Broadcast();
 	RoundStart();
+	
 }
 
 // Called when a scare spot is activated

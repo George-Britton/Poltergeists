@@ -9,7 +9,7 @@ void UToucheAbilityComponent::Execute()
 {
 	if (Player->OverlappingVictim)
 	{
-		Player->OverlappingVictim->ReceiveScare(Player->GetActorLocation(), ToucheStrength);
+		Player->Victim->ReceiveScare(Player->GetActorLocation(), ToucheStrength);
 		Player->DeclareSpecialDone();
 		if (!ActivationSpeaker->Sound) ActivationSpeaker->SetSound(Player->ToucheSound);
 		ActivationSpeaker->Play();

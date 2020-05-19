@@ -91,13 +91,22 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 void APlayerPoltergeist::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	AScareSpot* TestOverlap = Cast<AScareSpot>(OtherActor);
-	if (TestOverlap) OverlappedScareSpot = TestOverlap;
-
-	OverlappingVictim = Cast<AVictim>(OtherActor);
+	if (TestOverlap)
+	{
+		OverlappedScareSpot = TestOverlap;
+		return;
+	}
+	
+	AVictim* TestVictim = Cast<AVictim>(OtherActor);
+	if (TestVictim) OverlappingVictim = Cast<AVictim>(OtherActor);
 }
 void APlayerPoltergeist::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	if (OtherActor == OverlappedScareSpot) OverlappedScareSpot = nullptr;
+	if (OtherActor == OverlappedScareSpot)
+	{
+		OverlappedScareSpot = nullptr;
+		return;
+	}
 	if (OtherActor == OverlappingVictim) OverlappingVictim = nullptr;
 }
 
