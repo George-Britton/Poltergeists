@@ -79,34 +79,27 @@ void APlayerPoltergeist::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	// Reduce the cooldown timer
-	if (CooldownTimer > 0) FMath::Clamp<float>(CooldownTimer -= DeltaTime, 0, Cooldown);
+	if (CooldownTimer > 0) CooldownTimer -= DeltaTime;
 
 	// Reduce ability cooldowns
-	if (DashCooldownTimer > 0.f) FMath::Clamp<float>(DashCooldownTimer -= DeltaTime, 0, DashCooldown);
-	if (YeetCooldownTimer > 0.f) FMath::Clamp<float>(YeetCooldownTimer -= DeltaTime, 0, YeetCooldown);
-	if (SpecialCooldownTimer > 0.f) FMath::Clamp<float>(SpecialCooldownTimer -= DeltaTime, 0, SpecialCooldown);
+	if (DashCooldownTimer > 0.f) DashCooldownTimer -= DeltaTime;
+	if (YeetCooldownTimer > 0.f) YeetCooldownTimer -= DeltaTime;
+	if (SpecialCooldownTimer > 0.f) SpecialCooldownTimer -= DeltaTime;
 }
 
 // Called whenever the player overlaps with something or stops overlapping
 void APlayerPoltergeist::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	AScareSpot* TestOverlap = Cast<AScareSpot>(OtherActor);
-	if (TestOverlap)
-	{
-		OverlappedScareSpot = TestOverlap;
-		return;
-	}
+	if (TestOverlap) OverlappedScareSpot = TestOverlap;
 	
 	AVictim* TestVictim = Cast<AVictim>(OtherActor);
 	if (TestVictim) OverlappingVictim = Cast<AVictim>(OtherActor);
 }
 void APlayerPoltergeist::NotifyActorEndOverlap(AActor* OtherActor)
 {
-	if (OtherActor == OverlappedScareSpot)
-	{
-		OverlappedScareSpot = nullptr;
-		return;
-	}
+	if (OtherActor == OverlappedScareSpot) OverlappedScareSpot = nullptr;
+		
 	if (OtherActor == OverlappingVictim) OverlappingVictim = nullptr;
 }
 
@@ -152,7 +145,7 @@ void APlayerPoltergeist::MoveRight(float AxisValue)
 // Input action for scare activation
 void APlayerPoltergeist::ReceiveActivateScare()
 {
-	if (OverlappedScareSpot && CooldownTimer <= 0)
+	if (OverlappedScareSpot && CooldownTimer <= 0.f)
 	{
 		if (OverlappedScareSpot->ReceiveActivateScareSpot())
 		{
@@ -239,7 +232,7 @@ void APlayerPoltergeist::Yeet()
 }
 void APlayerPoltergeist::Special()
 {
-	if (!SpecialCooldownTimer) SpecialComponent->Execute();
+	if (SpecialCooldownTimer <= 0.f) SpecialComponent->Execute();
 }
 void APlayerPoltergeist::DeclareSpecialDone()
 {
