@@ -112,7 +112,12 @@ void AScareSpot::BeginRecharge()
 	{
 		ScareState = EScareState::RECHARGING;
 		RechargeTimer = 0;
-	} else ScareState = EScareState::OFF;
+	} else 
+	{
+		ActivationSphere->SetCollisionProfileName("NoCollision");
+		ActivationSphere->SetSphereRadius(0.1f);
+		ScareState = EScareState::OFF;
+	}
 }
 
 // Called when the scare spot is made active again
