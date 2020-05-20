@@ -32,7 +32,6 @@ void AVictim::ReceiveRunAway()
 {
 	IsRunningAway = true;
 	ScareSpots.Empty();
-	if (Room) Room->MarkForDeletion();
 
 	ScreamSpeaker->Stop();
 	ScreamSpeaker->SetSound(RunAwayScream);
@@ -47,12 +46,11 @@ void AVictim::ReceiveEnterNewRoom()
 {
 	// Destroys the room and resets the fear
 	Fear = StartingFear;
-	if (Room) Room->Delete();
 	OnEnterNewRoom.Broadcast();
 		
 	// Registers the new room and increments the round
-	Room = Cast<ARoom>(UGameplayStatics::GetActorOfClass(this, ARoom::StaticClass()));
-	Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
+	//Room = Cast<ARoom>(UGameplayStatics::GetActorOfClass(this, ARoom::StaticClass()));
+	//Door = Cast<ADoor>(UGameplayStatics::GetActorOfClass(this, ADoor::StaticClass()));
 
 	// Finds the new scare spots
 	TArray<AActor*> TempScareSpots;

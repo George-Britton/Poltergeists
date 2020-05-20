@@ -77,7 +77,7 @@ public:
 		ADoor* Door;
 
 	// The room to despawn on new round start
-	UPROPERTY(BlueprintReadOnly, Category = "Room")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		ARoom* Room;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		FVector StartLocation;

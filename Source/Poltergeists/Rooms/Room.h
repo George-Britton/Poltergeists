@@ -23,8 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Deletion")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Deletion")
 		void MarkForDeletion();
-	UFUNCTION(BlueprintImplementableEvent, Category = "Deletion")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Deletion")
 		void Delete();
 };

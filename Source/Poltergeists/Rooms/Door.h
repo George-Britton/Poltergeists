@@ -14,6 +14,9 @@ class POLTERGEISTS_API ADoor : public AActor
 public:
 
 	ADoor();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
+		USceneComponent* RunToPoint;
 	
 	// Called when the victim runs away
 	UFUNCTION(BlueprintCallable, Category = "Door", DisplayName = "Open")
