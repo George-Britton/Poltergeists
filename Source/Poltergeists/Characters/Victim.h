@@ -60,6 +60,7 @@ public:
 	// Array of all the scare spots - places they might run to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scares")
 		TArray<AScareSpot*> ScareSpots;
+		AScareSpot* LastScareSpotRunTo;
 
 	// Whether the victim is caught in a trap
 	UPROPERTY(BlueprintReadOnly, Category = "Trap")

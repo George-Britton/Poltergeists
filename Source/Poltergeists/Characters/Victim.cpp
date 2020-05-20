@@ -47,6 +47,7 @@ void AVictim::ReceiveEnterNewRoom()
 	// Destroys the room and resets the fear
 	Fear = StartingFear;
 	OnEnterNewRoom.Broadcast();
+	LastScareSpotRunTo = nullptr;
 		
 	// Registers the new room and increments the round
 	//Room = Cast<ARoom>(UGameplayStatics::GetActorOfClass(this, ARoom::StaticClass()));
@@ -154,8 +155,20 @@ void AVictim::ReceiveUnsnare(ATrap* Trap)
 // Called when the victim needs to choose a new scare spot to run to
 AScareSpot* AVictim::GetRandomScareSpot()
 {
-	if (ScareSpots.Num() != 0)
-		return ScareSpots[FMath::RandRange(0, ScareSpots.Num() - 1)];
+	
+	if (ScareSpots.Num() != 0 && LastScareSpotRunTo)
+	{
+		AScareSpot* NextScareSpot;
+		do
+		{
+			NextScareSpot = ScareSpots[FMath::RandRange(0, ScareSpots.Num() - 1)];
+		} while (NextScareSpot == LastScareSpotRunTo);
+		LastScareSpotRunTo = NextScareSpot;
+		return NextScareSpot;
+	} else if (!LastScareSpotRunTo)
+	{
+		LastScareSpotRunTo = Cast<AScareSpot>(UGameplayStatics::GetActorOfClass(this, AScareSpot::StaticClass()));
+	}
 
 	return nullptr;
 }
