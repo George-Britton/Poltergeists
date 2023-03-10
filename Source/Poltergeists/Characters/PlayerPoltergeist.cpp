@@ -53,10 +53,10 @@ void APlayerPoltergeist::ReceiveInitialise(int32 ID, int32 SpecialID)
 	const FTransform SpecialTransform;
 	switch(SpecialID)
 	{
-	case 0: SpecialComponent = Cast<UToucheAbilityComponent>(StaticConstructObject_Internal(UToucheAbilityComponent::StaticClass(), this)); break;
-	case 1: SpecialComponent = Cast<UCurseAbilityComponent>(StaticConstructObject_Internal(UCurseAbilityComponent::StaticClass(), this)); break;
-	case 2: SpecialComponent = Cast<UTimeBombAbilityComponent>(StaticConstructObject_Internal(UTimeBombAbilityComponent::StaticClass(), this)); break;
-	case 3: SpecialComponent = Cast<UTrapAbilityComponent>(StaticConstructObject_Internal(UTrapAbilityComponent::StaticClass(), this)); break;
+	case 0: SpecialComponent = NewObject<UToucheAbilityComponent>(this, UToucheAbilityComponent::StaticClass(), NAME_None, RF_Transient); break;
+	case 1: SpecialComponent = NewObject<UCurseAbilityComponent>(this, UCurseAbilityComponent::StaticClass(), NAME_None, RF_Transient); break;
+	case 2: SpecialComponent = NewObject<UTimeBombAbilityComponent>(this, UTimeBombAbilityComponent::StaticClass(), NAME_None, RF_Transient); break;
+	case 3: SpecialComponent = NewObject<UTrapAbilityComponent>(this, UTrapAbilityComponent::StaticClass(), NAME_None, RF_Transient); break;
 	default: break;
 	}
 	SpecialComponent->RegisterComponent();
